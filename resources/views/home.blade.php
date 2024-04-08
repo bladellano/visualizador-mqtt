@@ -1,20 +1,31 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', 'O Visualizador MQTT')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <h1>Seja bem-vindo.</h1>
 @stop
 
 @section('content')
-    <p>Welcome to this beautiful admin panel.</p>
+    <div class="card">
+        <div class="card-header">
+            Solução para visualizar os Eventos do MQTT Broker
+        </div>
+        <div class="card-body">
+            <p class="card-text">O Visualizador MQTT irá mostrar todos os eventos publicados e recebidos pelo Serviço MQTT Local.</p>
+            <p class="card-text"> Visualizador MQTT pode pesquisar e filtrar os eventos por vários campos a serem escolhidos.</p>
+            <a href="/reports" class="btn btn-primary btn-sm text-uppercase">Eventos</a>
+            <a href="/dashboard" class="btn btn-primary btn-sm text-uppercase">Dashboard</a>
+        </div>
+    </div>
+
 @stop
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+    <style>
+    </style>
 @stop
 
 @section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
+
 @stop
