@@ -68,8 +68,6 @@ class HomeController extends Controller
             ];
         }, $items);
 
-        #dd($items);
-
         return view('reports', compact('items'));
     }
 

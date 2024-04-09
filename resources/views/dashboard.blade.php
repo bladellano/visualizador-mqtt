@@ -13,8 +13,17 @@
 
 @section('content')
 
-    <p>STATUS: ON-LINE</p>
-
+    <div class="row">
+        <div class="col-md-12">
+            <input type="checkbox" id="status-maquina" data-off="OFF" data-on="ON" data-toggle="toggle" data-onstyle="success" data-size="xs">
+            <label id="nome-maquina">
+                <div class="spinner-border spinner-border-sm" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </label>
+        </div>
+    </div>
+    <hr>
     <div class="row">
         <div class="col-md-12">
             <div class="row">
@@ -49,6 +58,9 @@
 
 @section('css')
 
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+        rel="stylesheet">
+
     <style>
         .chartDiv {
             width: 100%;
@@ -67,24 +79,33 @@
     <script src="https://cdn.amcharts.com/lib/4/plugins/rangeSelector.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/lang/pt_BR.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             // START CHART's
+
             pieChart('quantidade-eventos', 'quantidade-eventos', 'quantidade', 'tipo_evento');
 
             chartXY('todos-eventos', 'todos-eventos', 'quantidade', 'tipo_evento');
 
             // END
 
+            verificarStatus();
+
+            setInterval(verificarStatus, 30000);
+
             $('#filterData').click(function() {
 
                 const startDate = document.getElementById("start-date").value;
                 const endDate = document.getElementById("end-date").value;
 
-                pieChart('quantidade-eventos', 'quantidade-eventos?start-date=' + startDate + '&end-date=' + endDate, 'quantidade', 'tipo_evento');
+                pieChart('quantidade-eventos', 'quantidade-eventos?start-date=' + startDate + '&end-date=' +
+                    endDate, 'quantidade', 'tipo_evento');
 
-                chartXY('todos-eventos', 'todos-eventos?start-date=' + startDate + '&end-date=' + endDate, 'quantidade', 'tipo_evento');
+                chartXY('todos-eventos', 'todos-eventos?start-date=' + startDate + '&end-date=' + endDate,
+                    'quantidade', 'tipo_evento');
 
             });
 
@@ -156,6 +177,21 @@
 
             function hideCopyright() {
                 $('g:has(> g[stroke="#3cabff"])').hide();
+            }
+
+            function verificarStatus() {
+
+                fetch('api/maquina-online')
+                    .then(response => response.json())
+                    .then(data => {
+                        $('#status-maquina').bootstrapToggle('enable');
+                        $('#status-maquina').bootstrapToggle(data.on_line == 1 ? 'on' : 'off');
+                        $('#nome-maquina').html(data.nome_maquina);
+                        $('#status-maquina').bootstrapToggle('disable');
+                    })
+                    .catch(error => {
+                        console.error('Erro ao consultar o endpoint:', error);
+                    });
             }
 
         });

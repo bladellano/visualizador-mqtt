@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChartController;
 
@@ -22,4 +23,10 @@ Route::prefix('chart')->group(function () {
     Route::get('/quantidade-eventos', [ChartController::class, 'quantidadeEventos']);
     Route::get('/todos-eventos', [ChartController::class, 'todosEventos']);
 });
+
+/** Api */
+Route::prefix('api')->group(function () {
+    Route::get('/maquina-online', [ApiController::class, 'maquinaOnline']);
+});
+
 
