@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Evento | ' . $evento['tipo_evento'])
+@section('title', env('APP_NAME', '--') . ' | Evento | ' . $evento['tipo_evento'])
 
 @section('content_header')
     <h1>Evento do MQTT</h1>

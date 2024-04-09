@@ -1,9 +1,14 @@
 @extends('adminlte::page')
 
-@section('title', 'Eventos')
+@section('title', env('APP_NAME', '--') . ' | Eventos')
 
 @section('content_header')
     <h1>Eventos</h1>
+@stop
+
+@section('preloader')
+    <i class="fas fa-4x fa-spin fa-spinner text-secondary"></i>
+    <h4 class="mt-4 text-dark">Por favor, aguarde enquanto consultamos o banco de dados MQTT.</h4>
 @stop
 
 @section('content')

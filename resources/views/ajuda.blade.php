@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Ajuda')
+@section('title', env('APP_NAME', '--') . ' | Ajuda')
 
 @section('content_header')
 <p></p>

@@ -13,7 +13,7 @@
         </div>
         <div class="card-body">
             <p class="card-text">O Visualizador MQTT irá mostrar todos os eventos publicados e recebidos pelo Serviço MQTT Local.</p>
-            <p class="card-text"> Visualizador MQTT pode pesquisar e filtrar os eventos por vários campos a serem escolhidos.</p>
+            <p class="card-text">Visualizador MQTT pode pesquisar e filtrar os eventos por vários campos a serem escolhidos.</p>
             <a href="/reports" class="btn btn-primary btn-sm text-uppercase">Eventos</a>
             <a href="/dashboard" class="btn btn-primary btn-sm text-uppercase">Dashboard</a>
         </div>
