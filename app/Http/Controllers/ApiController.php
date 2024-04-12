@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use stdClass;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ApiController extends Controller
@@ -41,15 +40,13 @@ class ApiController extends Controller
         return response()->json($retorno);
     }
 
-    public function reports(Request $request)
+    public function reports()
     {
-        $req = $request->all();
-
-        $length =  $req['length'];
-        $start =  $req["start"];
-        $searchValue =  $req['search']['value'];
-        $draw =  $req["draw"];
-        $order =  $req['order'][0];
+        $length =  $_REQUEST['length'];
+        $start =  $_REQUEST["start"];
+        $searchValue =  $_REQUEST['search']['value'];
+        $draw =  $_REQUEST["draw"];
+        $order =  $_REQUEST['order'][0];
     
         $WHERE = " WHERE TRUE ";
 
@@ -59,8 +56,8 @@ class ApiController extends Controller
             $WHERE .= " OR history.tipo_evento LIKE '" . $searchValue . "%' ";
         endif;
 
-        if(isset( $req['filter']) && !empty($req['filter'])) {
-            $WHERE .= " AND DATE(history.data_maquina) BETWEEN '". $req['filter']['start-date']."' AND '". $req['filter']['end-date']."' ";
+        if(isset( $_REQUEST['filter']) && !empty($_REQUEST['filter'])) {
+            $WHERE .= " AND DATE(history.data_maquina) BETWEEN '". $_REQUEST['filter']['start-date']."' AND '". $_REQUEST['filter']['end-date']."' ";
         }
 
         $SQL = "
