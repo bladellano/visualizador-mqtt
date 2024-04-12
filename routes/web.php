@@ -27,6 +27,7 @@ Route::prefix('chart')->group(function () {
 /** Api */
 Route::prefix('api')->group(function () {
     Route::get('/maquina-online', [ApiController::class, 'maquinaOnline']);
+    Route::get('/reports', [ApiController::class, 'reports']);
 });
 
 

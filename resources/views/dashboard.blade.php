@@ -27,14 +27,11 @@
     <div class="row">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-md-2">
-                    <input class="form-control form-control-sm" type="date" id="start-date">
-                </div>
-                <div class="col-md-2">
-                    <input class="form-control form-control-sm" type="date" id="end-date">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary btn-sm" id="filterData">Filtrar</button>
+                <div class="col-md-6">
+                    <label for="">Período:</label>
+                    <input type="date" name="start-date" id="start-date">
+                    <input type="date" name="end-date" id="end-date">
+                    <button id="filterData" class="btn btn-primary btn-sm">Filtrar</button>
                 </div>
             </div>
         </div>

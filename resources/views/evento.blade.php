@@ -19,26 +19,29 @@
             <p class="card-text">Aqui você encontrará os detalhes de cada evento.</p>
 
             <div class="row">
-                <div class="col-md-6">
-                    <ul class="list-group">
+                <div class="col-md-12">
 
-                        @foreach ($evento['eventos'] as $e)
-                            
-                            <li class="list-group-item">
-                                <h6 class="text-left">{{ $e }}:</h6>
+                    <ul class="list-attritutes">
+
+                        @foreach ($evento['eventos'] as $k => $v)
+                            <li>
+                                
+                                <h6 class="text-left font-weight-light text-uppercase">{{ $k }}</h6>
                                 <div class="progress">
                                     <div 
-                                        class="progress-bar" 
+                                        class="progress-bar {{ $v > 50 ? 'bg-danger' : '' }}" 
                                         role="progressbar" 
-                                        style="width: {{ $e }}%;" 
-                                        aria-valuenow="{{ $e }}" 
+                                        style="width: {{ $v }}%;"
+                                        aria-valuenow="{{ $v }}" 
                                         aria-valuemin="0" 
-                                        aria-valuemax="100">{{ $e }}%</div>
+                                        aria-valuemax="100"
+                                    >
+                                        {{ $v }}
+                                    </div>
                                 </div>
                             </li>
-                        
                         @endforeach
-                        
+
                     </ul>
                 </div>
             </div>
@@ -51,7 +54,24 @@
 @stop
 
 @section('css')
+    <style>
+        ul.list-attritutes {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
 
+        ul.list-attritutes>li {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        ul.list-attritutes>li:nth-child(6n) {
+            margin-right: 0;
+        }
+
+    </style>
 @stop
 
 @section('js')

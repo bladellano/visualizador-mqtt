@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -39,58 +40,36 @@ class HomeController extends Controller
 
     public function reports()
     {
-
-        $items = DB::connection('meraki_mqtt')->select('SELECT * FROM mqtt_history_view WHERE ts >= SUBDATE(CURDATE(), 5)');
-
-        $items = array_map(function ($item) {
-
-            $explodeTopic = explode('/', $item->topic);
-            $explodeValue = explode(';', $item->value);
-
-            $ts = Carbon::parse($item->ts)->format('d/m/Y H:i:s');
-
-            $subtopico = trim($explodeTopic[1]);
-
-            $info = \App\Classes\SubTopicos::obterInformacoes($subtopico);
-            $status = \App\Classes\SubTopicos::gerarStatus(@$info['tipo'], $item);
-
-            return [
-                'id' => $item->id,
-                'ts' => $ts,
-                'ts_last' => $item->ts_last,
-                'topic' => $item->topic,
-                'value' => $item->value,
-                'maquina' => $explodeTopic[0],
-                'subtopic' => "<span class='text-uppercase badge " . @$info['classe'] . "'>" . $subtopico . "</span>",
-                'subtopic_raw' => $subtopico,
-                'horamaquina' => $explodeValue[0],
-                'status' => $status
-            ];
-        }, $items);
-
-        return view('reports', compact('items'));
+        return view('reports');
     }
 
     public function evento($id, $tipo)
     {
 
-        $evento = DB::connection('meraki_mqtt')->select('
-            SELECT id,
-            ts,
-            ts_last,
-            topic,
-            STR_TO_DATE(SUBSTRING_INDEX(value, \';\', 1), \'%d/%m/%Y - %H:%i\') AS data_maquina,
-            SUBSTRING_INDEX(topic, \'/\', 1) AS nome_maquina,
-            SUBSTRING_INDEX(topic, \'/\', -1) AS tipo_evento,
-            value FROM mqtt_history_view WHERE id = ' . $id);
+        $sql = "
+            SELECT
+            history.*,
+            IF(TIMESTAMPDIFF(MINUTE, history.data_maquina, NOW()) > 2, '0', '1') AS on_line
+            FROM
+                (
+                SELECT
+                    mhv.*,
+                    SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
+                    STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1),
+                    '%d/%m/%Y - %H:%i') AS data_maquina,
+                    CONCAT(YEAR(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 
+                        '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
+                    SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento
+                FROM
+                    mqtt_history_view mhv 	
+                    ) history WHERE history.id = {$id}
+                ";
 
-        $ts = Carbon::parse($evento[0]->ts)->format('d/m/Y H:i:s');
-
+        $evento = DB::connection('meraki_mqtt')->select($sql);
         $evento = (array)$evento[0];
-        $evento['ts'] =  $ts;
+        $evento['ts'] = Carbon::parse($evento['ts'])->format('d/m/Y H:i:s');
 
-        $evento['eventos'] = explode(";", $evento['value']);
-        unset($evento['eventos'][0]); //? Removendo a data.
+        $evento['eventos'] = \App\Classes\SubTopicos::combineKeysValues($evento, $tipo);
 
         return view('evento', compact('evento'));
     }

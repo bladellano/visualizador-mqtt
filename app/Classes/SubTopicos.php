@@ -24,12 +24,64 @@ abstract class SubTopicos
         "Movimentação Maquina" => ["tipo" => 15, "classe" => "badge-warning"]
     ];
 
+    protected static $atributos = [
+        "15" => [
+            "Avanço Rolo Superior (Bar)",
+            "Recua Rolo Superior (Bar)",
+            "Avanço Rolo Inferior (Bar)",
+            "Recua Rolo Inferior (Bar)",
+            "Avança Esteira Esquerda (Bar)",
+            "Recua Esteira Esquerda (Bar)",
+            "Avança Esteira Direita (Bar)",
+            "Recua Esteira Direita (Bar)",
+            "Bomba Carga 1 (Bar)",
+            "Bomba Carga 2 (Bar)",
+            "Trocador Calor 1 (Bar)",
+            "Trocador Calor 2 (Bar)",
+            "Transportador de Saida (Bar)",
+            "Tensionador (Bar)",
+            "Embreagem (Bar)"
+        ],
+        "10" => [
+            "Pressão Oleo Motor (Bar)",
+            "Pressão Turbina (Bar)",
+            "Temperatura Motor (ºC)",
+            "Temperatura Turbina (ºC)",
+            "Percentual Torque (%)",
+            "Rotação (RPM)",
+            "Tensão Bateria (V)",
+            "Media Consumo Geral (L/H)",
+            "Media Consumo Picando (L/H)",
+            "Media Consumo Desde a última Partida (L/H)"
+        ],
+        "3" => [
+            "Tempo (ms)",
+            "Media Consumo (L/H)",
+            "Media Torque (%)"
+        ]
+    ];
+
+    public static function combineKeysValues($evento, $tipo): array
+    {
+        $eventoAtributos = explode(";", $evento['value']);
+        unset($eventoAtributos[0]);
+
+        if (!isset(static::$atributos[$tipo]))
+            return [];
+
+        $combine = array_combine(static::$atributos[$tipo], $eventoAtributos);
+
+        arsort($combine);
+
+        return $combine;
+    }
+
     public static function obterInformacoes($subtopico)
     {
         if (array_key_exists($subtopico, static::$subtopicos))
             return static::$subtopicos[$subtopico];
         else
-            return null;
+            return ["tipo" => 0, "classe" => "badge-secondary"];
     }
 
     public static function gerarStatus($tipo, $item)
@@ -41,7 +93,7 @@ abstract class SubTopicos
         $status = "";
         $link = "";
 
-        for ($i = 1; $i <= $totalMatrix; $i++) 
+        for ($i = 1; $i <= $totalMatrix; $i++)
             $status = $status . @$mret[$i] . ";";
 
         switch ($tipo) {
@@ -49,12 +101,14 @@ abstract class SubTopicos
                 $link = rtrim($status, ';');
                 break;
             case 1:
-                $link = "<a href='#' class='text-uppercase' data-toggle='tooltip' title='valor: " . rtrim($status, ';') . "'>VALOR: " . rtrim($status, ';') . "</a>";
+                $string = rtrim($status, ';');
+                $string = htmlspecialchars($string);
+                $link = "<span href='#' class='text-uppercase badge badge-info' data-toggle='tooltip' title='valor: " . $string . "'>" . $string . "</span>";
                 break;
             case 3:
             case 10:
             case 15:
-                $link = "<a class='text-uppercase badge badge-light' href='/reports/evento/$item->id/$tipo'><span class=\"fas fa-plus\"></span> detalhes</a>";
+                $link = "<a class='text-uppercase badge badge-light' href='/reports/evento/$item->id/$tipo'><span class=\"fas fa-eye\"></span> VER STATUS</a>";
                 break;
             default:
                 // Tratar outros tipos, se necessário
