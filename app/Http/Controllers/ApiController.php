@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+ini_set('memory_limit', '-1');
+
 use stdClass;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
