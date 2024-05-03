@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', env('APP_NAME', '--') . ' | Eventos')
+@section('title', config('app.name') . ' | Eventos')
 
 @section('content_header')
     <h1>Eventos</h1>
@@ -80,7 +80,7 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": "api/reports",
+                        "url": "api/reports-datatables",
                         "type": "GET",
                         "data": data
                     },

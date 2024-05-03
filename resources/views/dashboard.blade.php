@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', env('APP_NAME', '--') . ' | Dashboard')
+@section('title', config('app.name') . ' | Dashboard')
 
 @section('content_header')
     <h1>Dashboard</h1>
@@ -178,7 +178,7 @@
 
             function verificarStatus() {
 
-                fetch('api/maquina-online')
+                fetch('api/machine-on')
                     .then(response => response.json())
                     .then(data => {
                         $('#status-maquina').bootstrapToggle('enable');

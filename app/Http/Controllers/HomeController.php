@@ -38,6 +38,16 @@ class HomeController extends Controller
         return view('ajuda');
     }
 
+    public function live()
+    {
+        return view('live');
+    }
+
+    public function indicators()
+    {
+        return view('indicators');
+    }
+
     public function reports()
     {
         return view('reports');

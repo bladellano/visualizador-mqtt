@@ -320,11 +320,15 @@ return [
                 [
                     'text' => 'Principal',
                     'url' => '/dashboard',
-                ]                     
+                ],
+                [
+                    'text' => 'Indicadores',
+                    'url' => '/indicadores',
+                ]                   
             ],
         ],
         [
-            'text' => 'Eventos',
+            'text' => 'Relatório',
             'icon' => 'fas fa-copy',
             'submenu' => [
                 [

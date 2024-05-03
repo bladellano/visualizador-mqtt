@@ -84,7 +84,7 @@ abstract class SubTopicos
             return ["tipo" => 0, "classe" => "badge-secondary"];
     }
 
-    public static function gerarStatus($tipo, $item)
+    public static function generateStatus($tipo, $item)
     {
 
         $mret = @explode(";", $item->value);

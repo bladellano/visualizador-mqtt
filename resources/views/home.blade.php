@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'O Visualizador MQTT')
+@section('title', config('app.name'))
 
 @section('content_header')
     <h1>Seja bem-vindo.</h1>
