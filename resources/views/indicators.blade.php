@@ -3,7 +3,7 @@
 @section('title', config('app.name') . ' | Indicadores')
 
 @section('content_header')
-    <h1>Indicadores</h1>
+    <h5 class="font-weight-bold text-uppercase">Indicadores</h5>
 @stop
 
 @section('preloader')
@@ -15,13 +15,16 @@
 
     <div class="card">
         <div class="card-header">
-            Listagem de Eventos.
+            Listagem de SubTópicos.
         </div>
         <div class="card-body">
-            <div class="inner-indicators">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
+
+            <div class="content-body">
+                @foreach ($menu as $key => $item)
+                    <div class="board">
+                        <div class="title"><a href="chart/{{$item['view']}}/{{$item['base64']}}">{{ $key }}</a></div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -29,53 +32,34 @@
 @stop
 
 @section('css')
+    <style>
+        .content-body {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .content-body .board {
+            width: 120px;
+            height: 120px;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #007bff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 2px
+        }
+        .content-body .title {
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .content-body .title a{
+            color: white!important;
+            font-size: 14px
+        }
+    </style>
 @stop
 
 @section('js')
-    <script>
-        (async () => {
-
-            const _indicators = await indicators();
-
-            const ul = document.createElement("ul");
-            ul.className = 'list-group';
-            
-            _indicators.forEach(o => {
-                const li = document.createElement("li");
-                li.className = "list-group-item";
-
-                const a = document.createElement("a");
-                a.href = "live/" + btoa(o.tipo_evento)
-                a.textContent = o.tipo_evento;
-                a.className = 'text-uppercase';
-
-                li.appendChild(a);
-
-                ul.appendChild(li);
-
-            });
-
-            document.querySelector('.inner-indicators').innerHTML = null
-            document.querySelector('.inner-indicators').appendChild(ul);
-
-        })();
-
-        async function indicators() {
-            const data = await fetchData(`/api/registers-events`);
-            console.log("data ", data);
-
-            return data;
-        }
-
-        // FUNCTIONS
-        async function fetchData(endpoint) {
-            try {
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                throw error;
-            }
-        }
-    </script>
 @stop

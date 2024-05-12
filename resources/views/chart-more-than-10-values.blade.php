@@ -4,17 +4,22 @@
 
 @section('content_header')
 
-    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">← Indicadores</a>
-    <hr />
-    Manter leitura ao vivo: <input onchange="blockFilter()" type="checkbox" id="keep-reading" data-off="OFF" data-on="ON"
-        data-toggle="toggle" data-onstyle="success" data-size="xs">
-    <hr />
-    <h1 id="event_name">
+    <div class="row">
+        <div class="col-md-6">
+            <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">← VOLTAR</a>
+        </div>
+        <div class="col-md-6 text-right">
+            Manter leitura ao vivo: <input onchange="blockFilter()" type="checkbox" id="keep-reading" data-off="OFF"
+                data-on="ON" data-toggle="toggle" data-onstyle="success" data-size="xs">
+        </div>
+    </div>
+
+    <h5 id="indicator-name" class="font-weight-bold text-uppercase text-center">
         {{-- @TODO loading que pode virar componente --}}
         <div class="spinner-border spinner-border-sm" role="status">
             <span class="sr-only">Loading...</span>
         </div>
-    </h1>
+    </h5><hr>
 @stop
 
 @section('preloader')
@@ -25,23 +30,35 @@
 
 @section('content')
 
-    <div>
-        <div class="row">
-            <div class="col-md-6">
-                {{-- @TODO form/filter que pode virar componente --}}
-                <form action="#" id="formFilter">
-                    <label for="">Período:</label>
-                    <input type="datetime-local" name="start_date" id="start_date">
-                    <input type="datetime-local" name="end_date" id="end_date">
-                    <button id="btn-filter" type="submit" class="btn btn-primary btn-sm">Filtrar</button>
-                </form>
-            </div>
+    <div class="row">
+        <div class="col-md-2">
+            {{-- @TODO form/filter que pode virar componente --}}
+            <form action="#" id="formFilter">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input class="form-control" type="datetime-local" name="start_date" id="start_date">
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <input class="form-control" type="datetime-local" name="end_date" id="end_date">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mt-2">
+                        <button id="btn-filter" type="submit" class="btn btn-primary btn-sm">FILTRAR</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr/>
+
+            <div id="menu-id"></div>
+
+        </div>
+        <div class="col-md-10">
+            <figure class="highcharts-figure">
+            </figure>
         </div>
     </div>
-    <hr />
-
-    <figure class="highcharts-figure">
-    </figure>
 
 @stop
 
@@ -51,27 +68,41 @@
     <style>
         .highcharts-figure {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-            grid-auto-rows: 12rem;
+            grid-template-columns: repeat(4, minmax(16rem, 1fr));
+            grid-auto-rows: 165px;
             grid-gap: 2px;
-            grid-gap: 6px;
         }
 
         .content-wrapper {
             background-color: #fff !important;
+        }
+
+        /* 
+        .highcharts-figure>* { height: 65px; }
+        .hc-cat-title { font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .highcharts-title { display: none; } 
+        */
+        #menu-id {
+            overflow: auto;
+            height: 600px;
         }
     </style>
 @stop
 
 @section('js')
     <script src="https://code.highcharts.com/highcharts.js"></script>
+
+    <script src="https://code.highcharts.com/modules/bullet.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
+
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         CHARTS = [];
@@ -89,21 +120,26 @@
                 const qs = Object.fromEntries(new URLSearchParams(params));
 
                 if (!Object.values(qs).every(v => v !== ''))
-                    return alert('Por favor, preencha o filtro corretamente.')
+                    return alert('Por favor, preencha o filtro corretamente.');
+
+                Swal.showLoading();
 
                 console.time("tempo-de-execucao");
 
                 (async () => {
 
                     try {
-                        const details = await eventDetails(params);
+                        const _URL = new URL(window.location.href);
+                        const pathSegments = _URL.pathname.split("/").filter(segment => segment !== "");
+                        const _params = params ? `&${params}` : '';
 
-                        CHARTS.forEach(e => {
-                            e.series[0].points[0].update(+details[e.userOptions.title])
-                        });
+                        const eventByName = await fetchData(`/api/registers-events?type_event=${pathSegments.pop()}` + _params);
+
+                        createMenu(eventByName);
 
                     } catch (err) {
-                        alert(err.message);
+
+                        Swal.fire('Erro',err.message,'error');
 
                         const details = await eventDetails();
 
@@ -112,10 +148,36 @@
                         });
                     }
 
+                    Swal.hideLoading();
+
                 })();
 
                 console.timeEnd("tempo-de-execucao");
             });
+
+            $("body").delegate(".target-indicator", "click", async function(e){
+                 
+                try {
+
+                    const details = await eventDetails(`id=${e.target.dataset.id}`);
+
+                    CHARTS.forEach(e => {
+                        e.series[0].points[0].update(+details[e.userOptions.title])
+                        // e.series[0].points[0].update(+details[e.userOptions.title.text])
+                    });
+
+                } catch (err) {
+
+                    Swal.fire('Erro',err.message,'error');
+
+                    const details = await eventDetails();
+
+                    CHARTS.forEach(e => {
+                        e.series[0].points[0].update(0)
+                    });
+                }
+
+            }); 
 
         });
 
@@ -137,7 +199,8 @@
             }
 
             document.querySelectorAll('.chart-container').forEach((e) => {
-                var created = createChart(e.innerHTML, e.id);
+                // var created = createChartBullet(e.innerHTML, e.id);
+                var created = createChartSpeedometer(e.innerHTML, e.id);
                 CHARTS.push(created);
             });
 
@@ -157,6 +220,7 @@
 
                 CHARTS.forEach(e => {
                     e.series[0].points[0].update(+details[e.userOptions.title])
+                    // e.series[0].points[0].update(+details[e.userOptions.title.text])
                 });
 
             })();
@@ -184,7 +248,89 @@
             }
         }
 
-        function createChart(_title, _id) {
+        function createChartBullet(_title, _id) {
+
+            const options = {
+                chart: {
+                    inverted: true,
+                    marginLeft: 220,
+                    type: 'bullet'
+                },
+                title: {
+                    text: null
+                },
+                legend: {
+                    enabled: false
+                },
+                yAxis: {
+                    gridLineWidth: 0
+                },
+                plotOptions: {
+                    series: {
+                        pointPadding: 0.25,
+                        borderWidth: 0,
+                        color: '#000',
+                        targetOptions: {
+                            width: '280%'
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                exporting: {
+                    enabled: false
+                }
+            }
+
+            Highcharts.setOptions(options);
+
+            const chart = Highcharts.chart(_id, {
+                chart: {
+                    marginTop: 8
+                },
+                title: {
+                    text: _title
+                },
+                xAxis: {
+                    categories: ['<span class="hc-cat-title">' + _title + '</span>']
+                },
+                yAxis: {
+                    plotBands: [{
+                        from: 0,
+                        to: 50,
+                        color: '#eeeeee'
+                    }, {
+                        from: 50,
+                        to: 150,
+                        color: '#ffdb58'
+                    }, {
+                        from: 150,
+                        to: 300,
+                        color: '#ffc247'
+                    }, {
+                        from: 300,
+                        to: 9e9,
+                        color: '#ff6347'
+                    }],
+                    title: null
+                },
+                series: [{
+                    data: [{
+                        y: 0,
+                        target: 1
+                    }]
+                }],
+                tooltip: {
+                    pointFormat: '<b>{point.y}</b> (with target at {point.target})'
+                }
+            });
+
+            return chart;
+
+        }
+
+        function createChartSpeedometer(_title, _id) {
 
             const options = {
                 chart: {
@@ -267,6 +413,28 @@
             return chart;
         }
 
+        function createMenu(data) {
+
+                const ul = document.createElement("ul");
+
+                ul.className = 'list-group';
+
+                data.forEach(o => {
+
+                    const a = document.createElement("a");
+                    a.setAttribute('data-id', o.id);
+                    a.href = `#${o.id}`;
+                    a.textContent = `🕐 ${o.ts_formatada}`;
+                    a.className = "text-uppercase list-group-item list-group-item-action list-group-item-success target-indicator";
+
+                    ul.appendChild(a);
+
+                });
+
+                document.querySelector('#menu-id').innerHTML = null
+                document.querySelector('#menu-id').appendChild(ul);
+        }
+
         async function eventDetails(params = null) {
 
             const _URL = new URL(window.location.href);
@@ -285,7 +453,7 @@
 
             const event = await fetchData(`/api/registers-events/${eventByName[0].id}/${eventByName[0].event.tipo}`);
 
-            document.querySelector('#event_name').innerHTML = `Indicador <b>${event.tipo_evento}</b>`;
+            document.querySelector('#indicator-name').innerHTML = `${event.tipo_evento}`;
 
             return event.details;
         }

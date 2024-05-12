@@ -17,7 +17,8 @@ Route::get('/ajuda', [App\Http\Controllers\HomeController::class, 'ajuda'])->nam
 Route::get('/reports', [App\Http\Controllers\HomeController::class, 'reports'])->name('reports');
 Route::get('/reports/evento/{id}/{tipo}', [App\Http\Controllers\HomeController::class, 'evento'])->name('reports.evento');
 Route::get('/indicadores', [App\Http\Controllers\HomeController::class, 'indicators'])->name('indicators');
-Route::get('/live/{hash}', [App\Http\Controllers\HomeController::class, 'live'])->name('live');
+
+Route::get('/chart/{slug}/{base64}', [App\Http\Controllers\HomeController::class, 'chart'])->name('chart');
 
 /** Charts */
 Route::prefix('chart')->group(function () {

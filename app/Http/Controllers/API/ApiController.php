@@ -36,7 +36,7 @@ class ApiController extends Controller
         $event = DB::connection('meraki_mqtt')->select($sql);
 
         $event = array_map(function ($item) {
-            $item->value = utf8_encode($item->value); //? Remove caracteres indesejaveis.
+            $item->value = \App\Classes\Helper::removeUnwantedCharacters($item->value); //? Remove caracteres indesejaveis.
             return $item;
         }, $event);
 
@@ -51,49 +51,122 @@ class ApiController extends Controller
     public function getRegistersByEvents(Request $request)
     {
         $where = " WHERE TRUE ";
-        $where_ = $where;
+        $whereDateTime = $where;
 
-        #dd($request);
-
-        if (isset($request->type_event) && !empty($request->type_event)) 
+        if (isset($request->type_event) && !empty($request->type_event))
             $where .= " AND finally.tipo_evento =  '" . base64_decode($request->type_event) . "'";
 
         if (isset($request->id) && !empty($request->id))
-            $where .= " AND last_history.id = {$request->id}";
+            $where .= " AND finally.id = {$request->id}";
 
         if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date))
-            $where_ .= " AND history.data_maquina BETWEEN '$request->start_date' AND '$request->end_date'";
+            $whereDateTime .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
+        else
+            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
 
         $sql = "
-            SELECT last_history.id, finally.tipo_evento, last_history.value, last_history.ts, STR_TO_DATE(SUBSTRING_INDEX(last_history.value, ';', 1), '%d/%m/%Y - %H:%i') AS data_maquina 
+            SELECT 
+            finally.id, 
+            finally.tipo_evento, 
+            finally.value, 
+            finally.mensagem, 
+            finally.ts, 
+            DATE_FORMAT(finally.ts, '%d/%m/%Y %H:%i:%s') AS ts_formatada,
+            finally.data_maquina 
                 FROM (
                     SELECT
                         history.*,
-                        IF(TIMESTAMPDIFF(MINUTE, history.data_maquina, NOW()) > 200000, '0', '1') AS on_line,
-                        MAX(history.id) AS max_history_id
+                        IF(TIMESTAMPDIFF(MINUTE, history.data_maquina, NOW()) > 200000, '0', '1') AS on_line
                     FROM (
                         SELECT
                             mhv.*,
                             SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
                             STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') AS data_maquina,
+                            SUBSTRING_INDEX(value, ';', -1) AS mensagem,
                             CONCAT(YEAR(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 
                             '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
                             SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento
                         FROM
-                            mqtt_history_view mhv
+                            mqtt_history_view mhv $whereDateTime
                     ) history
-                    $where_
-                    GROUP BY history.tipo_evento
-                ) finally 
-                INNER JOIN mqtt_history_view last_history ON last_history.id = finally.max_history_id $where";
+                ) finally ";
 
-        #echo '<pre>utf8_encode($sql)<br />'; print_r(utf8_encode($sql)); echo '</pre>'; die;
+        $orderBy = ' ORDER BY finally.id DESC ';
 
-        $records = DB::connection('meraki_mqtt')->select(utf8_encode($sql));
+        $sql = \App\Classes\Helper::removeUnwantedCharacters($sql);
+        $query = $sql . $where . $orderBy;
+
+        $records = DB::connection('meraki_mqtt')->select($query);
 
         $records = array_map(function ($item) {
-            $item->value = utf8_encode($item->value); //? Remove caracteres indesejaveis.
+            $item->value = \App\Classes\Helper::removeUnwantedCharacters($item->value);
             $item->event = \App\Classes\SubTopicos::obterInformacoes($item->tipo_evento);
+            return $item;
+        }, $records);
+
+        return response()->json($records);
+    }
+
+    public function getMessageOneValue(Request $request)
+    {
+
+        $where = " WHERE TRUE ";
+        $whereDateTime = $where;
+
+        if (isset($request->type_event) && !empty($request->type_event))
+            $where .= " AND finally.tipo_evento =  '" . base64_decode($request->type_event) . "'";
+
+        if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date))
+            $whereDateTime .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
+        else
+            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY ";
+
+        $sql = "
+            SELECT 
+            finally.id, 
+            finally.tipo_evento, 
+            finally.value, 
+            finally.mensagem,
+            finally.ts, 
+            finally.data_maquina,
+            finally.on_line,
+            finally.ano_mes,     
+            finally._timestamp,
+            finally.ts_formated,
+            count(*) as _count
+                FROM (
+                    SELECT
+                        history.*,
+                        IF(TIMESTAMPDIFF(MINUTE, history.data_maquina, NOW()) > 200000, '0', '1') AS on_line
+                    FROM (
+                        SELECT
+                            mhv.*,
+                            SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
+                            STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') AS data_maquina,
+                            SUBSTRING_INDEX(value, ';', -1) AS mensagem,
+                            CONCAT(YEAR(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 
+                            '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
+                            SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento,
+                            UNIX_TIMESTAMP(mhv.ts) as _timestamp,
+                            DATE_FORMAT(mhv.ts, '%d/%m/%Y') AS ts_formated
+                        FROM
+                            mqtt_history_view mhv $whereDateTime
+                    ) history
+                ) finally ";
+
+        $orderBy = ' ORDER BY finally.id DESC ';
+
+        $groupBy = ' GROUP BY DATE(finally.ts) ';
+
+        $sql = \App\Classes\Helper::removeUnwantedCharacters($sql);
+
+        $query = $sql . $where .  $groupBy . $orderBy;
+
+        $records = DB::connection('meraki_mqtt')->select($query);
+
+        $records = array_map(function ($item) {
+            $item->value = \App\Classes\Helper::removeUnwantedCharacters($item->value);
+            $item->mensagem = \App\Classes\Helper::removeUnwantedCharacters($item->mensagem);
             return $item;
         }, $records);
 
@@ -148,9 +221,10 @@ class ApiController extends Controller
             $WHERE .= " OR history.tipo_evento LIKE '" . $searchValue . "%' ";
         endif;
 
-        if (isset($_REQUEST['filter']) && !empty($_REQUEST['filter'])) {
+        if (isset($_REQUEST['filter']) && !empty($_REQUEST['filter']))
             $WHERE .= " AND DATE(history.data_maquina) BETWEEN '" . $_REQUEST['filter']['start-date'] . "' AND '" . $_REQUEST['filter']['end-date'] . "' ";
-        }
+        else
+            $WHERE .= " AND history.data_maquina >= CURDATE() - INTERVAL 30 DAY ";
 
         $SQL = "
             SELECT

@@ -18,10 +18,9 @@ abstract class SubTopicos
         "Produção Torque 90 a 100%" => ["tipo" => 3, "classe" => "badge-success"],
         "Ultimo Registro Antes Reset" => ["tipo" => 3, "classe" => "badge-success"],
         "Registro Produção Sem Reset" => ["tipo" => 3, "classe" => "badge-success"],
-        "Registro Producao Sem Reset" => ["tipo" => 3, "classe" => "badge-success"],
         "Dados Motor Diesel" => ["tipo" => 10, "classe" => "badge-info"],
         "Pressões Bombas" => ["tipo" => 15, "classe" => "badge-danger"],
-        "Movimentação Maquina" => ["tipo" => 15, "classe" => "badge-warning"]
+        "Movimentação Maquina" => ["tipo" => 1, "classe" => "badge-warning"]
     ];
 
     protected static $atributos = [
@@ -34,16 +33,16 @@ abstract class SubTopicos
             "Recua Esteira Esquerda (Bar)",
             "Avança Esteira Direita (Bar)",
             "Recua Esteira Direita (Bar)",
-            "Bomba Carga 1 (Bar)",
-            "Bomba Carga 2 (Bar)",
-            "Trocador Calor 1 (Bar)",
-            "Trocador Calor 2 (Bar)",
+            "Bomba Carga I (Bar)",
+            "Bomba Carga II (Bar)",
+            "Trocador Calor I (Bar)",
+            "Trocador Calor II (Bar)",
             "Transportador de Saida (Bar)",
             "Tensionador (Bar)",
             "Embreagem (Bar)"
         ],
         "10" => [
-            "Pressão Oleo Motor (Bar)",
+            "Pressão Óleo Motor (Bar)",
             "Pressão Turbina (Bar)",
             "Temperatura Motor (ºC)",
             "Temperatura Turbina (ºC)",
@@ -57,14 +56,17 @@ abstract class SubTopicos
         "3" => [
             "Tempo (ms)",
             "Media Consumo (L/H)",
-            "Media Torque (%)"
+            "Media Torque (%)",
         ]
     ];
 
     public static function combineKeysValues($evento, $tipo): array
     {
         $eventoAtributos = explode(";", $evento['value']);
-        unset($eventoAtributos[0]);
+        unset($eventoAtributos[0]); // Remove informacao do tipo data.
+
+        if($tipo == 3) //! @TODO POG
+            array_pop($eventoAtributos);
 
         if (!isset(static::$atributos[$tipo]))
             return [];

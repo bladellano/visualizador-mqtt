@@ -38,14 +38,33 @@ class HomeController extends Controller
         return view('ajuda');
     }
 
-    public function live()
+    public function chart($slug)
     {
-        return view('live');
+        return view($slug);
     }
 
     public function indicators()
     {
-        return view('indicators');
+        $menu = \App\Classes\Indicadores::MENU;
+        $hashMenu = \App\Classes\Indicadores::convertArrayToBase64($menu);
+
+        $merged = [];
+
+        foreach ($hashMenu as $key => $value) {
+
+            $decodedValue = $value;
+
+            if (array_key_exists($key, $menu)) {
+                $merged[$key] = [
+                    'base64' => $decodedValue,
+                    'view' => $menu[$key]
+                ];
+            }
+        }
+
+        $menu = $merged;
+
+        return view('indicators', compact('menu'));
     }
 
     public function reports()
