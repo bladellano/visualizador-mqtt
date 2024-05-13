@@ -4,6 +4,8 @@
 
 @section('content_header')
 
+    <x-loading/>
+   
     <div class="row">
         <div class="col-md-6">
             <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">← VOLTAR</a>
@@ -17,9 +19,12 @@
     <h5 id="indicator-name" class="font-weight-bold text-uppercase text-center">
         {{-- @TODO loading que pode virar componente --}}
         <div class="spinner-border spinner-border-sm" role="status">
-            <span class="sr-only">Loading...</span>
+            <span class="sr-only">Carregando...</span>
         </div>
-    </h5><hr>
+    </h5>
+    
+    <hr>
+
 @stop
 
 @section('preloader')
@@ -32,23 +37,9 @@
 
     <div class="row">
         <div class="col-md-2">
-            {{-- @TODO form/filter que pode virar componente --}}
-            <form action="#" id="formFilter">
-                <div class="row">
-                    <div class="col-md-12">
-                        <input class="form-control" type="datetime-local" name="start_date" id="start_date">
-                    </div>
-                    <div class="col-md-12 mt-2">
-                        <input class="form-control" type="datetime-local" name="end_date" id="end_date">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mt-2">
-                        <button id="btn-filter" type="submit" class="btn btn-primary btn-sm">FILTRAR</button>
-                    </div>
-                </div>
-            </form>
 
+            <x-filter :with_time="true"/>
+       
             <hr/>
 
             <div id="menu-id"></div>
@@ -63,8 +54,10 @@
 @stop
 
 @section('css')
-    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
-        rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/loading.css') }}">
+
     <style>
         .highcharts-figure {
             display: grid;
@@ -84,8 +77,9 @@
         */
         #menu-id {
             overflow: auto;
-            height: 600px;
+            height: 550px;
         }
+
     </style>
 @stop
 
@@ -112,17 +106,17 @@
 
             blockFilter();
 
-            $('#formFilter').submit(function(e) {
+            $('#form-filter').submit(function(e) {
 
                 e.preventDefault();
 
                 const params = $(e.target).serialize();
                 const qs = Object.fromEntries(new URLSearchParams(params));
 
-                if (!Object.values(qs).every(v => v !== ''))
-                    return alert('Por favor, preencha o filtro corretamente.');
+                if ( !qs.closed_period && (!qs.start_date || !qs.end_date) )
+                    return Swal.fire('Erro','Por favor, preencha o filtro corretamente.','error');
 
-                Swal.showLoading();
+                $('#loading-screen').fadeIn();
 
                 console.time("tempo-de-execucao");
 
@@ -148,15 +142,17 @@
                         });
                     }
 
-                    Swal.hideLoading();
+                    $('#loading-screen').fadeOut();
 
                 })();
 
                 console.timeEnd("tempo-de-execucao");
             });
 
-            $("body").delegate(".target-indicator", "click", async function(e){
+            $("body").delegate(".target-indicator-clicked", "click", async function(e){
                  
+                $('#loading-screen').fadeIn();
+
                 try {
 
                     const details = await eventDetails(`id=${e.target.dataset.id}`);
@@ -176,6 +172,8 @@
                         e.series[0].points[0].update(0)
                     });
                 }
+
+                $('#loading-screen').fadeOut();
 
             }); 
 
@@ -425,7 +423,7 @@
                     a.setAttribute('data-id', o.id);
                     a.href = `#${o.id}`;
                     a.textContent = `🕐 ${o.ts_formatada}`;
-                    a.className = "text-uppercase list-group-item list-group-item-action list-group-item-success target-indicator";
+                    a.className = "text-uppercase list-group-item list-group-item-action list-group-item-secondary target-indicator-clicked";
 
                     ul.appendChild(a);
 

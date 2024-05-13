@@ -59,10 +59,18 @@ class ApiController extends Controller
         if (isset($request->id) && !empty($request->id))
             $where .= " AND finally.id = {$request->id}";
 
-        if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date))
+        if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
+
             $whereDateTime .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
-        else
+
+        } else if(isset($request->closed_period) && !empty($request->closed_period)) {
+
+            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+
+        } else {
+            
             $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
+        }
 
         $sql = "
             SELECT 
@@ -116,10 +124,18 @@ class ApiController extends Controller
         if (isset($request->type_event) && !empty($request->type_event))
             $where .= " AND finally.tipo_evento =  '" . base64_decode($request->type_event) . "'";
 
-        if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date))
+        if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
+
             $whereDateTime .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
-        else
-            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY ";
+
+        } else if(isset($request->closed_period) && !empty($request->closed_period)) {
+
+            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+
+        } else {
+            
+            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
+        }
 
         $sql = "
             SELECT 

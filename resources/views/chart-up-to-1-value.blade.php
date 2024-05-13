@@ -4,6 +4,8 @@
 
 @section('content_header')
 
+    <x-loading/>
+
     <div class="row">
         <div class="col-md-6">
             <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">← VOLTAR</a>
@@ -33,22 +35,8 @@
 
     <div class="row">
         <div class="col-md-2">
-            {{-- @TODO form/filter que pode virar componente --}}
-            <form action="#" id="formFilter">
-                <div class="row">
-                    <div class="col-md-12">
-                        <input class="form-control" type="date" name="start_date" id="start_date">
-                    </div>
-                    <div class="col-md-12 mt-2">
-                        <input class="form-control" type="date" name="end_date" id="end_date">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mt-2">
-                        <button id="btn-filter" type="submit" class="btn btn-primary btn-sm">FILTRAR</button>
-                    </div>
-                </div>
-            </form>
+
+            <x-filter/>
 
             <hr />
 
@@ -65,8 +53,9 @@
 @stop
 
 @section('css')
-    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
-        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/loading.css') }}">
+
     <style>
         .content-wrapper {
             background-color: #fff !important;
@@ -91,22 +80,23 @@
     <script>
 
         TIME = 3000;
+        TITLE = 'Quantidade de disparos por dia.'
 
         document.addEventListener('DOMContentLoaded', function() {
 
             blockFilter();
 
-            $('#formFilter').submit(function(e) {
+            $('#form-filter').submit(function(e) {
 
                 e.preventDefault();
 
                 const params = $(e.target).serialize();
                 const qs = Object.fromEntries(new URLSearchParams(params));
 
-                if (!Object.values(qs).every(v => v !== ''))
-                    return alert('Por favor, preencha o filtro corretamente.');
+                if ( !qs.closed_period && (!qs.start_date || !qs.end_date) )
+                    return Swal.fire('Erro','Por favor, preencha o filtro corretamente.','error');
 
-                Swal.showLoading();
+                $('#loading-screen').fadeIn();
 
                 console.time("tempo-de-execucao");
 
@@ -119,13 +109,13 @@
 
                         const dataChartLine = await fetchData(`/api/mensagens-um-valor?type_event=${pathSegments.pop()}` + _params);
 
-                        chart = createChartLine('Quantidade de disparos', 'container', dataChartLine, 'line');
+                        chart = createChartLine(TITLE, 'container', dataChartLine, 'line');
 
                     } catch (err) {
                         Swal.fire('Erro',err.message,'error');
                     }
 
-                    Swal.hideLoading();
+                    $('#loading-screen').fadeOut();
 
                 })();
 
@@ -139,7 +129,7 @@
 
             try {
                 const dataChartLine = await getData();
-                chart = createChartLine('Quantidade de disparos', 'container', dataChartLine, 'line');
+                chart = createChartLine(TITLE, 'container', dataChartLine, 'line');
 
             } catch (error) {
 
