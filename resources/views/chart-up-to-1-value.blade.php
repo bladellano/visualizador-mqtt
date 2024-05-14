@@ -4,7 +4,7 @@
 
 @section('content_header')
 
-    <x-loading/>
+    <x-loading />
 
     <div class="row">
         <div class="col-md-6">
@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-md-2">
 
-            <x-filter/>
+            <x-filter />
 
             <hr />
 
@@ -69,7 +69,6 @@
 
 @section('js')
     <script src="https://code.highcharts.com/highcharts.js"></script>
-
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
 
@@ -78,7 +77,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-
+        
         TIME = 3000;
         TITLE = 'Quantidade de disparos por dia.'
 
@@ -88,15 +87,13 @@
 
             $('#form-filter').submit(function(e) {
 
-                e.preventDefault();
+                e.preventDefault(); 
 
                 const params = $(e.target).serialize();
                 const qs = Object.fromEntries(new URLSearchParams(params));
 
-                if ( !qs.closed_period && (!qs.start_date || !qs.end_date) )
-                    return Swal.fire('Erro','Por favor, preencha o filtro corretamente.','error');
-
-                $('#loading-screen').fadeIn();
+                if (!qs.closed_period && (!qs.start_date || !qs.end_date))
+                    return Swal.fire('Erro', 'Por favor, preencha o filtro corretamente.', 'error');
 
                 console.time("tempo-de-execucao");
 
@@ -107,12 +104,14 @@
                         const pathSegments = _URL.pathname.split("/").filter(segment => segment !== '');
                         const _params = params ? `&${params}` : '';
 
-                        const dataChartLine = await fetchData(`/api/mensagens-um-valor?type_event=${pathSegments.pop()}` + _params);
+                        const dataChartLine = await fetchData(`/api/mensagens-um-valor?type_event=${pathSegments.pop()}&group_by_message=1` + _params);
+
+                        $('#loading-screen').fadeIn();
 
                         chart = createChartLine(TITLE, 'container', dataChartLine, 'line');
 
                     } catch (err) {
-                        Swal.fire('Erro',err.message,'error');
+                        Swal.fire('Erro', err.message, 'error');
                     }
 
                     $('#loading-screen').fadeOut();
@@ -128,12 +127,12 @@
         (async () => {
 
             try {
-                const dataChartLine = await getData();
+                const dataChartLine = await getData('group_by_message=1');
                 chart = createChartLine(TITLE, 'container', dataChartLine, 'line');
 
-            } catch (error) {
+            } catch (err) {
 
-                Swal.fire('Erro',err.message,'error');
+                Swal.fire('Erro', err.message, 'error');
             }
 
         })();
@@ -148,14 +147,15 @@
                 else
                     return console.log('> Locked')
 
-                const dataChartLine = await getData();
+                const dataChartLine = await getData('group_by_message=1');
 
-                chart = createChartLine('Quantidade de disparos...', 'container', dataChartLine, 'line');
+                chart = createChartLine(`${TITLE}...`, 'container', dataChartLine, 'line');
 
             })();
 
         }, TIME);
 
+        // FUNCTIONS
         function blockFilter() {
 
             const btnFilter = document.getElementById('btn-filter');
@@ -166,18 +166,53 @@
                 btnFilter.removeAttribute('disabled');
         }
 
-        // FUNCTIONS
         async function fetchData(endpoint) {
             try {
                 const response = await fetch(endpoint);
                 const data = await response.json();
-                return data;
+
+                return hasContent(data);
+
             } catch (error) {
                 throw error;
             }
         }
 
+        function hasContent(data) {
+            if (Array.isArray(data)) {
+                if (!data.length)
+                    throw new Error("Nenhum resultado foi encontrado.");
+                return data;
+                } else if (data instanceof Object) {
+                    return data;
+                } else {
+                    throw new Error("Nenhum resultado foi encontrado.");
+                }
+        }
+        
         async function createChartLine(_title, _id, _data, _type = 'column') {
+
+            var aSeries = [];
+            var categories_ = [];
+
+            if(identifyInstance(_data) == 'Array') {
+
+                document.querySelector('#indicator-name').innerHTML = _data[0].tipo_evento;
+
+                aSeries.push({name:_data[0].mensagem, data: _data.map(item => item._count)});
+                categories_ = _data.map((item) => item.ts_formated);
+
+            } else if (identifyInstance(_data) == 'Object') {
+
+                for(let message in _data) {
+
+                    document.querySelector('#indicator-name').innerHTML = _data[message][0].tipo_evento;
+
+                    aSeries.push({name:message, data: _data[message].map(item => item._count)});
+                    categories_.push(..._data[message].map((item) => item.ts_formated));
+                }
+
+            }
 
             const chart = Highcharts.chart(_id, {
                 chart: {
@@ -187,9 +222,7 @@
                     text: _title
                 },
                 xAxis: {
-                    categories: _data.map(function(item) {
-                        return item.ts_formated;
-                    }),
+                    categories: categories_,
                 },
                 yAxis: {
                     min: 0,
@@ -197,15 +230,20 @@
                         text: 'Quantidade de Registros'
                     }
                 },
-                series: [{
-                    name: 'Vezes',
-                    data: _data.map(function(item) {
-                        return item._count;
-                    })
-                }]
+                series: aSeries
             });
 
             return chart;
+        }
+
+        function identifyInstance(el) {
+            if (Array.isArray(el)) {
+                return 'Array';
+            } else if (el !== null && typeof el === 'object') {
+                return 'Object';
+            } else {
+                return 'Other';
+            }
         }
 
         async function getData(params = null) {
@@ -217,16 +255,11 @@
             const hash = pathSegments.pop();
 
             if (!hash)
-                return;
+                throw new Error("Não foi informado a hash do tipo de evento.");
 
             const record = await fetchData(`/api/mensagens-um-valor?type_event=${hash}` + _params);
-            
-            if (!record.length)
-                throw new Error("Nenhum resultado foi encontrado.");
-            
-            document.querySelector('#indicator-name').innerHTML = `${record[0].tipo_evento}`;
 
-            return record;
+            return hasContent(record);
         }
     </script>
 

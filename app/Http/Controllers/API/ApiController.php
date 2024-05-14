@@ -112,6 +112,12 @@ class ApiController extends Controller
             return $item;
         }, $records);
 
+        if (isset($request->group_by_message) && $request->group_by_message == 1) {
+            $collection = collect($records);
+            $grouped = $collection->groupBy('mensagem');
+            $records = $grouped->toArray();
+        }
+
         return response()->json($records);
     }
 
@@ -186,6 +192,12 @@ class ApiController extends Controller
             return $item;
         }, $records);
 
+        if (isset($request->group_by_message) && $request->group_by_message == 1) {
+            $collection = collect($records);
+            $grouped = $collection->groupBy('mensagem');
+            $records = $grouped->toArray();
+        }
+        
         return response()->json($records);
     }
 
