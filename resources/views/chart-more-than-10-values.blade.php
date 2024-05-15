@@ -4,11 +4,11 @@
 
 @section('content_header')
 
-    <x-loading/>
-   
+    <x-loading />
+
     <div class="row">
         <div class="col-md-6">
-            <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">← VOLTAR</a>
+            <a href="{{ route('indicators') }}" class="btn btn-secondary btn-sm">VOLTAR</a>
         </div>
         <div class="col-md-6 text-right">
             Manter leitura ao vivo: <input onchange="blockFilter()" type="checkbox" id="keep-reading" data-off="OFF"
@@ -22,7 +22,7 @@
             <span class="sr-only">Carregando...</span>
         </div>
     </h5>
-    
+
     <hr>
 
 @stop
@@ -38,9 +38,9 @@
     <div class="row">
         <div class="col-md-2">
 
-            <x-filter :with_time="true"/>
-       
-            <hr/>
+            <x-filter :with_time="true" />
+
+            <hr />
 
             <div id="menu-id"></div>
 
@@ -55,7 +55,8 @@
 
 @section('css')
 
-    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/loading.css') }}">
 
     <style>
@@ -70,23 +71,16 @@
             background-color: #fff !important;
         }
 
-        /* 
-        .highcharts-figure>* { height: 65px; }
-        .hc-cat-title { font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        .highcharts-title { display: none; } 
-        */
         #menu-id {
             overflow: auto;
             height: 550px;
         }
-
     </style>
 @stop
 
 @section('js')
     <script src="https://code.highcharts.com/highcharts.js"></script>
 
-    <script src="https://code.highcharts.com/modules/bullet.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
 
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
@@ -99,6 +93,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+
         CHARTS = [];
         TIME = 3000;
 
@@ -113,8 +108,8 @@
                 const params = $(e.target).serialize();
                 const qs = Object.fromEntries(new URLSearchParams(params));
 
-                if ( !qs.closed_period && (!qs.start_date || !qs.end_date) )
-                    return Swal.fire('Erro','Por favor, preencha o filtro corretamente.','error');
+                if (!qs.closed_period && (!qs.start_date || !qs.end_date))
+                    return Swal.fire('Erro', 'Por favor, preencha o filtro corretamente.', 'error');
 
                 $('#loading-screen').fadeIn();
 
@@ -123,23 +118,29 @@
                 (async () => {
 
                     try {
+
                         const _URL = new URL(window.location.href);
                         const pathSegments = _URL.pathname.split("/").filter(segment => segment !== "");
                         const _params = params ? `&${params}` : '';
 
                         const eventByName = await fetchData(`/api/registers-events?type_event=${pathSegments.pop()}` + _params);
 
+                        /* Se não existir os elementos em tela, ele constroi. */
+                        if(!document.querySelectorAll('.chart-container').length) {
+                            const params = $('#form-filter').serialize();
+                            const details = await eventDetails(params);
+                            createChartsOnScreen(details);
+                        }
+
                         createMenu(eventByName);
 
                     } catch (err) {
 
-                        Swal.fire('Erro',err.message,'error');
+                        Swal.fire('Erro', err.message, 'error');
 
                         const details = await eventDetails();
 
-                        CHARTS.forEach(e => {
-                            e.series[0].points[0].update(0)
-                        });
+                        updateCHART(0);
                     }
 
                     $('#loading-screen').fadeOut();
@@ -149,43 +150,90 @@
                 console.timeEnd("tempo-de-execucao");
             });
 
-            $("body").delegate(".target-indicator-clicked", "click", async function(e){
-                 
+            $("body").delegate(".target-indicator-clicked", "click", async function(e) {
+
                 $('#loading-screen').fadeIn();
 
                 try {
 
                     const details = await eventDetails(`id=${e.target.dataset.id}`);
 
-                    CHARTS.forEach(e => {
-                        e.series[0].points[0].update(+details[e.userOptions.title])
-                        // e.series[0].points[0].update(+details[e.userOptions.title.text])
-                    });
+                    updateCHART(details);
 
                 } catch (err) {
 
-                    Swal.fire('Erro',err.message,'error');
+                    Swal.fire('Erro', err.message, 'error');
 
                     const details = await eventDetails();
 
-                    CHARTS.forEach(e => {
-                        e.series[0].points[0].update(0)
-                    });
+                    updateCHART(0);
+
                 }
 
                 $('#loading-screen').fadeOut();
 
-            }); 
+            });
 
         });
 
+        // Start
         (async () => {
 
-            const details = await eventDetails();
+            try {
+
+                const params = $('#form-filter').serialize();
+
+                const details = await eventDetails(params);
+
+                createChartsOnScreen(details);
+
+                updateCHART(details);
+
+            } catch (err) {
+                Swal.fire('Erro', err.message, 'error');
+            }
+
+        })();
+
+        // Atualiza Chart(s) de tempo em tempo.
+        setInterval(function() {
+
+            (async () => {
+
+                if (document.querySelector('#keep-reading').checked)
+                    console.log('%cUnlocked', 'color: #5ac039');
+                else
+                    return console.log('%cLocked', 'color: #fff');
+
+                const details = await eventDetails();
+
+                updateCHART(details);
+
+            })();
+
+        }, TIME);
+
+        // FUNCTIONS
+        function blockFilter() {
+
+            updateCHART(0);
+
+            const btnFilter = document.getElementById('btn-filter');
+
+            if (document.querySelector('#keep-reading').checked)
+                btnFilter.setAttribute('disabled', 'disabled');
+            else
+                btnFilter.removeAttribute('disabled');
+        }
+
+        /** @argument _attributes é um objeto com chave e valor dos atributos do tipo de evento:
+         * Ex: {"Media Consumo Geral (L/H)": "23", "Media Consumo Desde a última Partida (L/H)": "23", "Pressão Óleo Motor (Bar)": "0.0"}
+         * */
+        function createChartsOnScreen(_attributes) {
 
             const highchartsFigure = document.querySelector(".highcharts-figure");
 
-            for (key in details) {
+            for (key in _attributes) {
 
                 const div = document.createElement("div");
 
@@ -197,45 +245,16 @@
             }
 
             document.querySelectorAll('.chart-container').forEach((e) => {
-                // var created = createChartBullet(e.innerHTML, e.id);
                 var created = createChartSpeedometer(e.innerHTML, e.id);
                 CHARTS.push(created);
             });
 
-        })();
-
-        // Atualiza Chart(s) de tempo em tempo.
-        setInterval(function() {
-
-            (async () => {
-
-                if (document.querySelector('#keep-reading').checked)
-                    console.log('> Destravado')
-                else
-                    return console.log('> Travado')
-
-                const details = await eventDetails();
-
-                CHARTS.forEach(e => {
-                    e.series[0].points[0].update(+details[e.userOptions.title])
-                    // e.series[0].points[0].update(+details[e.userOptions.title.text])
-                });
-
-            })();
-
-        }, TIME);
-
-        function blockFilter() {
-
-            const btnFilter = document.getElementById('btn-filter');
-
-            if (document.querySelector('#keep-reading').checked)
-                btnFilter.setAttribute('disabled', 'disabled');
-            else
-                btnFilter.removeAttribute('disabled');
         }
 
-        // FUNCTIONS
+        async function updateCHART(_details) {
+            CHARTS.forEach(e => e.series[0].points[0].update(+_details[e.userOptions.title]));
+        }
+
         async function fetchData(endpoint) {
             try {
                 const response = await fetch(endpoint);
@@ -244,88 +263,6 @@
             } catch (error) {
                 throw error;
             }
-        }
-
-        function createChartBullet(_title, _id) {
-
-            const options = {
-                chart: {
-                    inverted: true,
-                    marginLeft: 220,
-                    type: 'bullet'
-                },
-                title: {
-                    text: null
-                },
-                legend: {
-                    enabled: false
-                },
-                yAxis: {
-                    gridLineWidth: 0
-                },
-                plotOptions: {
-                    series: {
-                        pointPadding: 0.25,
-                        borderWidth: 0,
-                        color: '#000',
-                        targetOptions: {
-                            width: '280%'
-                        }
-                    }
-                },
-                credits: {
-                    enabled: false
-                },
-                exporting: {
-                    enabled: false
-                }
-            }
-
-            Highcharts.setOptions(options);
-
-            const chart = Highcharts.chart(_id, {
-                chart: {
-                    marginTop: 8
-                },
-                title: {
-                    text: _title
-                },
-                xAxis: {
-                    categories: ['<span class="hc-cat-title">' + _title + '</span>']
-                },
-                yAxis: {
-                    plotBands: [{
-                        from: 0,
-                        to: 50,
-                        color: '#eeeeee'
-                    }, {
-                        from: 50,
-                        to: 150,
-                        color: '#ffdb58'
-                    }, {
-                        from: 150,
-                        to: 300,
-                        color: '#ffc247'
-                    }, {
-                        from: 300,
-                        to: 9e9,
-                        color: '#ff6347'
-                    }],
-                    title: null
-                },
-                series: [{
-                    data: [{
-                        y: 0,
-                        target: 1
-                    }]
-                }],
-                tooltip: {
-                    pointFormat: '<b>{point.y}</b> (with target at {point.target})'
-                }
-            });
-
-            return chart;
-
         }
 
         function createChartSpeedometer(_title, _id) {
@@ -413,24 +350,25 @@
 
         function createMenu(data) {
 
-                const ul = document.createElement("ul");
+            const ul = document.createElement("ul");
 
-                ul.className = 'list-group';
+            ul.className = 'list-group';
 
-                data.forEach(o => {
+            data.forEach(o => {
 
-                    const a = document.createElement("a");
-                    a.setAttribute('data-id', o.id);
-                    a.href = `#${o.id}`;
-                    a.textContent = `🕐 ${o.ts_formatada}`;
-                    a.className = "text-uppercase list-group-item list-group-item-action list-group-item-secondary target-indicator-clicked";
+                const a = document.createElement("a");
+                a.setAttribute('data-id', o.id);
+                a.href = `#${o.id}`;
+                a.textContent = `🕐 ${o.ts_formatada}`;
+                a.className =
+                    "text-uppercase list-group-item list-group-item-action list-group-item-secondary target-indicator-clicked";
 
-                    ul.appendChild(a);
+                ul.appendChild(a);
 
-                });
+            });
 
-                document.querySelector('#menu-id').innerHTML = null
-                document.querySelector('#menu-id').appendChild(ul);
+            document.querySelector('#menu-id').innerHTML = null
+            document.querySelector('#menu-id').appendChild(ul);
         }
 
         async function eventDetails(params = null) {
@@ -447,7 +385,7 @@
             const eventByName = await fetchData(`/api/registers-events?type_event=${hash}` + _params);
 
             if (!eventByName.length)
-                throw new Error("Nenhum resultado foi encontrado.");
+                throw new Error("Nenhum resultado foi encontrado. Tente ajustar o filtro.");
 
             const event = await fetchData(`/api/registers-events/${eventByName[0].id}/${eventByName[0].event.tipo}`);
 

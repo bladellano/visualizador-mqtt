@@ -6,9 +6,9 @@
                     <option value="">Por Período de Tempo</option>
                     <option value="1">Últimos 24 horas</option>
                     <option value="15">Últimos 15 dias</option>
-                    <option value="30">Últimos 30 dias</option>
-                    <option value="60">Últimos 60 dias</option>
-                    <option value="90" selected>Últimos 90 dias</option>
+                    <option value="30" selected>Últimos 30 dias</option>
+                    <option value="60" >Últimos 60 dias</option>
+                    <option value="90">Últimos 90 dias</option>
                 </select>
             </div>
         </div>

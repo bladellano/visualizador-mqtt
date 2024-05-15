@@ -8,7 +8,7 @@
 
     <div class="row">
         <div class="col-md-6">
-            <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">← VOLTAR</a>
+            <a href="{{ route('indicators') }}" class="btn btn-secondary btn-sm">VOLTAR</a>
         </div>
         <div class="col-md-6 text-right">
             Manter leitura ao vivo: <input onchange="blockFilter()" type="checkbox" id="keep-reading" data-off="OFF"
