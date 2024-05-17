@@ -123,22 +123,21 @@ class ApiController extends Controller
     {
 
         $where = " WHERE TRUE ";
-        $whereDateTime = $where;
 
         if (isset($request->type_event) && !empty($request->type_event))
-            $where .= " AND finally.tipo_evento =  '" . base64_decode($request->type_event) . "'";
+            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) = '" . base64_decode($request->type_event) . "'";
 
         if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
 
-            $whereDateTime .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
+            $where .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
 
         } else if(isset($request->closed_period) && !empty($request->closed_period)) {
 
-            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
 
         } else {
             
-            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
         }
 
         $sql = "
@@ -146,7 +145,10 @@ class ApiController extends Controller
             finally.id, 
             finally.tipo_evento, 
             finally.value, 
-            finally.mensagem,
+            CASE
+                WHEN finally.tipo_evento IN ('Horimetro Esteiras Locomoção','Horimetro Motor Diesel') THEN CONCAT('Valor: ', finally.mensagem)
+                ELSE finally.mensagem
+            END mensagem, 
             finally.ts, 
             finally.data_maquina,
             finally.on_line,
@@ -170,7 +172,7 @@ class ApiController extends Controller
                             UNIX_TIMESTAMP(mhv.ts) as _timestamp,
                             DATE_FORMAT(mhv.ts, '%d/%m/%Y') AS ts_formated
                         FROM
-                            mqtt_history_view mhv $whereDateTime
+                            mqtt_history_view mhv $where
                     ) history
                 ) finally ";
 
@@ -178,9 +180,7 @@ class ApiController extends Controller
 
         $groupBy = ' GROUP BY DATE(finally.ts) ';
 
-        $sql = \App\Classes\Helper::removeUnwantedCharacters($sql);
-
-        $query = $sql . $where .  $groupBy . $orderBy;
+        $query = $sql .  $groupBy . $orderBy;
 
         $records = DB::connection('meraki_mqtt')->select($query);
 
