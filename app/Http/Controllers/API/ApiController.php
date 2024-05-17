@@ -30,8 +30,8 @@ class ApiController extends Controller
                         '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
                     SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento
                 FROM
-                    mqtt_history_view mhv 	
-                    ) history WHERE history.id = {$id}";
+                    mqtt_history_view mhv WHERE mhv.id = {$id}
+                    ) history";
 
         $event = DB::connection('meraki_mqtt')->select($sql);
 
@@ -100,7 +100,6 @@ class ApiController extends Controller
 
         $orderBy = ' ORDER BY finally.id DESC ';
 
-        $sql = \App\Classes\Helper::removeUnwantedCharacters($sql);
         $query = $sql . $orderBy;
 
         $records = DB::connection('meraki_mqtt')->select($query);
