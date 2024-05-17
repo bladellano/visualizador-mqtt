@@ -100,11 +100,12 @@
                 (async () => {
 
                     try {
+                        const queryString = window.location.search;
                         const _URL = new URL(window.location.href);
                         const pathSegments = _URL.pathname.split("/").filter(segment => segment !== '');
                         const _params = params ? `&${params}` : '';
 
-                        const dataChartLine = await fetchData(`/api/mensagens-um-valor?type_event=${pathSegments.pop()}&group_by_message=1` + _params);
+                        const dataChartLine = await fetchData(`/api/mensagens-um-valor${queryString}&group_by_message=1` + _params);
 
                         $('#loading-screen').fadeIn();
 
@@ -248,6 +249,7 @@
 
         async function getData(params = null) {
 
+            const queryString = window.location.search;
             const _URL = new URL(window.location.href);
             const pathSegments = _URL.pathname.split("/").filter(segment => segment !== "");
             const _params = params ? `&${params}` : '';
@@ -257,7 +259,7 @@
             if (!hash)
                 throw new Error("Não foi informado a hash do tipo de evento.");
 
-            const record = await fetchData(`/api/mensagens-um-valor?type_event=${hash}` + _params);
+            const record = await fetchData(`/api/mensagens-um-valor${queryString}` + _params);
 
             return hasContent(record);
         }

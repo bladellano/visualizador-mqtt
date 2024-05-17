@@ -118,12 +118,12 @@
                 (async () => {
 
                     try {
-
+                        const queryString = window.location.search;
                         const _URL = new URL(window.location.href);
                         const pathSegments = _URL.pathname.split("/").filter(segment => segment !== "");
                         const _params = params ? `&${params}` : '';
 
-                        const eventByName = await fetchData(`/api/registers-events?type_event=${pathSegments.pop()}` + _params);
+                        const eventByName = await fetchData(`/api/registers-events${queryString}` + _params);
 
                         /* Se não existir os elementos em tela, ele constroi. */
                         if(!document.querySelectorAll('.chart-container').length) {
@@ -373,6 +373,7 @@
 
         async function eventDetails(params = null) {
 
+            const queryString = window.location.search;
             const _URL = new URL(window.location.href);
             const pathSegments = _URL.pathname.split("/").filter(segment => segment !== "");
             const _params = params ? `&${params}` : '';
@@ -382,7 +383,7 @@
             if (!hash)
                 return;
 
-            const eventByName = await fetchData(`/api/registers-events?type_event=${hash}` + _params);
+            const eventByName = await fetchData(`/api/registers-events${queryString}` + _params);
 
             if (!eventByName.length)
                 throw new Error("Nenhum resultado foi encontrado. Tente ajustar o filtro.");

@@ -18,13 +18,20 @@
             Listagem de SubTópicos.
         </div>
         <div class="card-body">
-
             <div class="content-body">
                 @foreach ($menu as $key => $item)
                     <div class="board">
-                        <div class="title"><a href="chart/{{$item['view']}}/{{$item['base64']}}">{{ $key }}</a></div>
+                        <div class="title"><a href="chart/{{ $item['view'] }}?type_event[]={{ $item['base64'] }}">{{ $key }}</a>
+                        </div>
                     </div>
                 @endforeach
+                <div class="board bg-important">
+                    <div class="title">
+                        <a href="chart/{{ $item['view'] }}?type_event[]=TWFxdWluYSBPbiBMaW5l&type_event[]=SG9yaW1ldHJvIE1vdG9yIERpZXNlbA==&type_event[]=SG9yaW1ldHJvIEVzdGVpcmFzIExvY29tb8Onw6Nv&type_event[]=QWxhcm1lIEF0aXZv">•
+                            Maquina On Line <br> • Horimetro Motor Diesel <br> • Horimetro Esteiras Locomoção <br> • Alarme Ativo
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -37,6 +44,7 @@
             display: flex;
             flex-wrap: wrap;
         }
+
         .content-body .board {
             width: 120px;
             height: 120px;
@@ -44,19 +52,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #007bff;
-            border: 1px solid #ccc;
+            background-color: #ffb739;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
-            padding: 2px
+            padding: 2px;
+
         }
+
         .content-body .title {
             text-align: center;
             text-transform: uppercase;
         }
-        .content-body .title a{
-            color: white!important;
-            font-size: 14px
+
+        .content-body .title a {
+            color: #000;
+            font-size: 14px;
+        }
+
+        .content-body .board.bg-important {
+            width: inherit;
+            white-space: nowrap;
+            display: inline-block;
+            background-color: #5969ff;
+        }
+
+        .content-body .board.bg-important .title a {
+            color: white !important;
         }
     </style>
 @stop

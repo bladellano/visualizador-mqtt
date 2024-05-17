@@ -53,7 +53,7 @@ class ApiController extends Controller
         $where = " WHERE TRUE ";
 
         if (isset($request->type_event) && !empty($request->type_event))
-            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) = '" . base64_decode($request->type_event) . "'";
+            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) IN (" . \App\Classes\Helper::_implode($request->type_event, true) . ")";
 
         if (isset($request->id) && !empty($request->id))
             $where .= " AND id = {$request->id}";
@@ -125,7 +125,7 @@ class ApiController extends Controller
         $where = " WHERE TRUE ";
 
         if (isset($request->type_event) && !empty($request->type_event))
-            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) = '" . base64_decode($request->type_event) . "'";
+            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) IN (" . \App\Classes\Helper::_implode($request->type_event, true) . ")";
 
         if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
 
@@ -146,7 +146,8 @@ class ApiController extends Controller
             finally.tipo_evento, 
             finally.value, 
             CASE
-                WHEN finally.tipo_evento IN ('Horimetro Esteiras Locomoção','Horimetro Motor Diesel') THEN CONCAT('Valor: ', finally.mensagem)
+                WHEN finally.tipo_evento IN ('Maquina On Line','Horimetro Esteiras Locomoção','Horimetro Motor Diesel') 
+                    THEN CONCAT(finally.tipo_evento, ': ', finally.mensagem)
                 ELSE finally.mensagem
             END mensagem, 
             finally.ts, 
@@ -178,7 +179,7 @@ class ApiController extends Controller
 
         $orderBy = ' ORDER BY finally.id DESC ';
 
-        $groupBy = ' GROUP BY DATE(finally.ts) ';
+        $groupBy = ' GROUP BY finally.tipo_evento, DATE(finally.ts) ';
 
         $query = $sql .  $groupBy . $orderBy;
 
