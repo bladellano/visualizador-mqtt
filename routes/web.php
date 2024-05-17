@@ -21,7 +21,7 @@ Route::get('/indicadores', [App\Http\Controllers\HomeController::class, 'indicat
 Route::get('/chart/{slug}', [App\Http\Controllers\HomeController::class, 'chart'])->name('chart');
 
 /** Charts */
-Route::prefix('chart')->group(function () {
+Route::prefix('chart-dashboard')->group(function () {
     Route::get('/quantidade-eventos', [ChartController::class, 'quantidadeEventos']);
     Route::get('/todos-eventos', [ChartController::class, 'todosEventos']);
 });

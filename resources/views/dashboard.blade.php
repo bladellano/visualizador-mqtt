@@ -116,7 +116,7 @@
 
                 chart.marginRight = 400;
 
-                var data = await fetchData('/chart/' + endpoint);
+                var data = await fetchData('/chart-dashboard/' + endpoint);
 
                 chart.data = data;
 
@@ -148,7 +148,7 @@
 
                 hideCopyright();
 
-                dados = await fetchData('/chart/' + endpoint);
+                dados = await fetchData('/chart-dashboard/' + endpoint);
 
                 chart.data = dados;
 
