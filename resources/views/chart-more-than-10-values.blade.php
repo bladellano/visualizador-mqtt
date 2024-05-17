@@ -387,7 +387,7 @@
             if (!eventByName.length)
                 throw new Error("Nenhum resultado foi encontrado. Tente ajustar o filtro.");
 
-            const event = await fetchData(`/api/registers-events/${eventByName[0].id}/${eventByName[0].event.tipo}`);
+            const event = await fetchData(`/api/registers-details/${eventByName[0].id}/${eventByName[0].event.tipo}`);
 
             document.querySelector('#indicator-name').innerHTML = `${event.tipo_evento}`;
 

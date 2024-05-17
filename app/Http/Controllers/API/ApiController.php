@@ -51,25 +51,24 @@ class ApiController extends Controller
     public function getRegistersByEvents(Request $request)
     {
         $where = " WHERE TRUE ";
-        $whereDateTime = $where;
 
         if (isset($request->type_event) && !empty($request->type_event))
-            $where .= " AND finally.tipo_evento =  '" . base64_decode($request->type_event) . "'";
+            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) = '" . base64_decode($request->type_event) . "'";
 
         if (isset($request->id) && !empty($request->id))
-            $where .= " AND finally.id = {$request->id}";
+            $where .= " AND id = {$request->id}";
 
         if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
 
-            $whereDateTime .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
+            $where .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
 
         } else if(isset($request->closed_period) && !empty($request->closed_period)) {
 
-            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
 
         } else {
             
-            $whereDateTime .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
         }
 
         $sql = "
@@ -95,14 +94,14 @@ class ApiController extends Controller
                             '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
                             SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento
                         FROM
-                            mqtt_history_view mhv $whereDateTime
+                            mqtt_history_view mhv $where
                     ) history
                 ) finally ";
 
         $orderBy = ' ORDER BY finally.id DESC ';
 
         $sql = \App\Classes\Helper::removeUnwantedCharacters($sql);
-        $query = $sql . $where . $orderBy;
+        $query = $sql . $orderBy;
 
         $records = DB::connection('meraki_mqtt')->select($query);
 
