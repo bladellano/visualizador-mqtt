@@ -21,7 +21,9 @@
             <div class="content-body">
                 @foreach ($menu as $key => $item)
                     <div class="board">
-                        <div class="title"><a href="chart/{{ $item['view'] }}?type_event[]={{ $item['base64'] }}">{{ $key }}</a>
+                        <div class="title">
+                            <img src="{{ asset('images/engine.png') }}" alt=""><br/>
+                            <a href="chart/{{ $item['view'] }}?type_event[]={{ $item['base64'] }}">{{ $key }}</a>
                         </div>
                     </div>
                 @endforeach
@@ -46,17 +48,22 @@
         }
 
         .content-body .board {
-            width: 120px;
+            width: 250px;
             height: 120px;
             margin: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #ffb739;
+            background-color: #fff;
+            border: 1px solid #999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
             padding: 2px;
 
+        }
+
+        .content-body .board:hover {
+            background-color: #ccc;
         }
 
         .content-body .title {
@@ -70,10 +77,10 @@
         }
 
         .content-body .board.bg-important {
-            width: inherit;
-            white-space: nowrap;
             display: inline-block;
-            background-color: #5969ff;
+            background-color: #000;
+            border: 1px solid #333;!important;
+
         }
 
         .content-body .board.bg-important .title a {

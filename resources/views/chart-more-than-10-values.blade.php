@@ -11,8 +11,7 @@
             <a href="{{ route('indicators') }}" class="btn btn-secondary btn-sm">VOLTAR</a>
         </div>
         <div class="col-md-6 text-right">
-            Manter leitura ao vivo: <input onchange="blockFilter()" type="checkbox" id="keep-reading" data-off="OFF"
-                data-on="ON" data-toggle="toggle" data-onstyle="success" data-size="xs">
+            Manter leitura ao vivo: <input onchange="blockFilter()" type="checkbox" id="keep-reading" data-off="OFF" data-on="ON" data-toggle="toggle" data-onstyle="success" data-size="xs">
         </div>
     </div>
 
@@ -36,16 +35,16 @@
 @section('content')
 
     <div class="row">
-        <div class="col-md-2">
 
-            <x-filter :with_time="true" />
+        <div class="col-md-12">
 
-            <hr />
-
-            <div id="menu-id"></div>
+            <x-filter :with_time="true" />          
 
         </div>
-        <div class="col-md-10">
+
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <figure class="highcharts-figure">
             </figure>
         </div>
@@ -70,11 +69,7 @@
         .content-wrapper {
             background-color: #fff !important;
         }
-
-        #menu-id {
-            overflow: auto;
-            height: 550px;
-        }
+     
     </style>
 @stop
 
@@ -150,13 +145,14 @@
                 console.timeEnd("tempo-de-execucao");
             });
 
-            $("body").delegate(".target-indicator-clicked", "click", async function(e) {
+            // FOCO
+            $("body").delegate(".target-change-time", "change", async function(e) {
 
                 $('#loading-screen').fadeIn();
 
                 try {
 
-                    const details = await eventDetails(`id=${e.target.dataset.id}`);
+                    const details = await eventDetails(`id=${e.currentTarget.value}`);
 
                     updateCHART(details);
 
@@ -350,25 +346,32 @@
 
         function createMenu(data) {
 
-            const ul = document.createElement("ul");
+            const select = document.createElement("select");
 
-            ul.className = 'list-group';
+            const selectTime = document.querySelector('#menu-id');
+
+            select.className = 'form-control form-control-sm target-change-time';
+
+            var option = document.createElement("option");
+            option.value = '';
+            option.textContent = `--Selecione o Tempo--`;
+
+            select.appendChild(option);
 
             data.forEach(o => {
 
-                const a = document.createElement("a");
-                a.setAttribute('data-id', o.id);
-                a.href = `#${o.id}`;
-                a.textContent = `🕐 ${o.ts_formatada}`;
-                a.className =
-                    "text-uppercase list-group-item list-group-item-action list-group-item-secondary target-indicator-clicked";
+                var option = document.createElement("option");
+                option.value = o.id;
+                option.textContent = `🕐 ${o.ts_formatada}`;
 
-                ul.appendChild(a);
+                select.appendChild(option);
 
             });
 
-            document.querySelector('#menu-id').innerHTML = null
-            document.querySelector('#menu-id').appendChild(ul);
+             if(document.querySelector('.target-change-time'))
+                document.querySelector('.target-change-time').remove();
+
+            selectTime.appendChild(select);            
         }
 
         async function eventDetails(params = null) {

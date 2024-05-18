@@ -39,14 +39,14 @@
     <hr>
     <div class="row">
         <div class="col-md-12">
-            <h5>Gráfico pieChart</h5>
+            <h5>Gráfico de proporção em porcentagem dos tipos de indicadores (Pizza)</h5>
             <div id="quantidade-eventos" class="chartDiv"></div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <h5>Gráfico chartXY</h5>
+            <h5>Gráfico de proporção em porcentagem dos tipos de indicadores (Barras)</h5>
             <div id="todos-eventos" class="chartDiv"></div>
         </div>
     </div>

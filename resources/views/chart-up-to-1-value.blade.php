@@ -34,16 +34,17 @@
 @section('content')
 
     <div class="row">
-        <div class="col-md-2">
-
+        <div class="col-md-12">
             <x-filter />
-
-            <hr />
 
             <div id="menu-id"></div>
 
         </div>
-        <div class="col-md-10">
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
 
             <div id="container"></div>
 
