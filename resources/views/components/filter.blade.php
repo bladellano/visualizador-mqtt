@@ -4,7 +4,7 @@
         <div class="row">
 
             <div class="col-md-3">
-                <select name="closed_period" class="form-control form-control-sm">
+                <select {{ $closedPeriodDisabled ? 'disabled' : '' }} name="closed_period" class="form-control form-control-sm">
                     <option value="">Por Período de Tempo</option>
                     <option value="1">Últimos 24 horas</option>
                     <option value="15">Últimos 15 dias</option>

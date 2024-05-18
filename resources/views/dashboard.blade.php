@@ -19,34 +19,27 @@
             <label id="nome-maquina">
                 <div class="spinner-border spinner-border-sm" role="status">
                 <span class="sr-only">Loading...</span>
-              </div>
+            </div>
             </label>
         </div>
     </div>
-    <hr>
+
+    <x-filter :closed_period_disabled="1"/>
+
+    <hr/>
+
     <div class="row">
         <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-6">
-                    <label for="">Período:</label>
-                    <input type="date" name="start-date" id="start-date">
-                    <input type="date" name="end-date" id="end-date">
-                    <button id="filterData" class="btn btn-primary btn-sm">Filtrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col-md-12">
-            <h5>Gráfico de proporção em <strong>porcentagem</strong> dos tipos de indicadores (Pizza)</h5>
+            <h6>Gráfico de proporção em <strong>porcentagem</strong> dos tipos de indicadores (Pizza)</h6>
             <div id="quantidade-eventos" class="chartDiv"></div>
         </div>
     </div>
 
+    <hr/>
+    
     <div class="row">
         <div class="col-md-12">
-            <h5>Gráfico de proporção em <strong>quantidade</strong> dos tipos de indicadores (Barras)</h5>
+            <h6>Gráfico de proporção em <strong>quantidade</strong> dos tipos de indicadores (Barras)</h6>
             <div id="todos-eventos" class="chartDiv"></div>
         </div>
     </div>
@@ -93,10 +86,12 @@
 
             setInterval(verificarStatus, 30000);
 
-            $('#filterData').click(function() {
+            $('#form-filter').click(function(e) {
 
-                const startDate = document.getElementById("start-date").value;
-                const endDate = document.getElementById("end-date").value;
+                e.preventDefault();
+
+                const startDate = document.getElementById("start_date").value;
+                const endDate = document.getElementById("end_date").value;
 
                 pieChart('quantidade-eventos', 'quantidade-eventos?start-date=' + startDate + '&end-date=' +
                     endDate, 'quantidade', 'tipo_evento');
