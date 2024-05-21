@@ -48,9 +48,8 @@
         }
 
         .content-body .board {
-            width: 250px;
             height: 120px;
-            margin: 10px;
+            margin: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -59,7 +58,8 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
             padding: 2px;
-
+            flex: 1 1 250px;
+            transition: ease .3s;
         }
 
         .content-body .board:hover {
@@ -78,7 +78,7 @@
 
         .content-body .board.bg-important {
             display: inline-block;
-            background-color: #000;
+            background-color: #666;
             border: 1px solid #333;!important;
 
         }

@@ -180,6 +180,7 @@
             }
         }
 
+        /** Verifica se é um objeto ou array e retorna o 'data' */
         function hasContent(data) {
             if (Array.isArray(data)) {
                 if (!data.length)
@@ -196,10 +197,11 @@
 
             var aSeries = [];
             var categories_ = [];
+            var nameTypeEvents = [];
 
             if(identifyInstance(_data) == 'Array') {
 
-                document.querySelector('#indicator-name').innerHTML = _data[0].tipo_evento;
+                nameTypeEvents.push(_data[0].tipo_evento);
 
                 aSeries.push({name:_data[0].mensagem, data: _data.map(item => item._count)});
                 categories_ = _data.map((item) => item.ts_formated);
@@ -208,13 +210,15 @@
 
                 for(let message in _data) {
 
-                    document.querySelector('#indicator-name').innerHTML = _data[message][0].tipo_evento;
+                    nameTypeEvents.push(_data[message][0].tipo_evento);
 
                     aSeries.push({name:message, data: _data[message].map(item => item._count)});
                     categories_.push(..._data[message].map((item) => item.ts_formated));
                 }
 
             }
+
+            document.querySelector('#indicator-name').innerHTML = [...new Set(nameTypeEvents)].join(', ');
 
             const chart = Highcharts.chart(_id, {
                 chart: {
