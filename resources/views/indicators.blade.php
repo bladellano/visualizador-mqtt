@@ -34,6 +34,13 @@
                         </a>
                     </div>
                 </div>
+                <div class="board bg-important">
+                    <div class="title">
+                        <a href="chart/{{ $item['view'] }}?type_event[]=UmVnaXN0cm8gUHJvZHVjYW8gU2VtIFJlc2V0&type_event[]=TWFxdWluYSBPbiBMaW5l&type_event[]=U2l0dWHDp8OjbyBUcmFuc3BvcnRhZG9yIGRlIFNhaWRh&type_event[]=U2l0dWHDp8OjbyBBbGltZW50YcOnw6NvIE1hcXVpbmE=">
+                            • Registro Producao Sem Reset <br> • Maquina On Line <br> • Situação Transportador de Saida <br> • Situação Alimentação Maquina
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
