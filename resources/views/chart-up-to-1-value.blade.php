@@ -15,13 +15,13 @@
                 data-on="ON" data-toggle="toggle" data-onstyle="success" data-size="xs">
         </div>
     </div>
-
-    <h5 id="indicator-name" class="font-weight-bold text-uppercase text-center">
+    <hr>
+    <h6 id="indicator-name" class="font-weight-bold text-uppercase text-center">
         {{-- @TODO loading que pode virar componente --}}
         <div class="spinner-border spinner-border-sm" role="status">
             <span class="sr-only">Loading...</span>
         </div>
-    </h5>
+    </h6>
     <hr>
 @stop
 
@@ -218,7 +218,7 @@
 
             }
 
-            document.querySelector('#indicator-name').innerHTML = [...new Set(nameTypeEvents)].join(', ');
+            document.querySelector('#indicator-name').innerHTML = [...new Set(nameTypeEvents)].join(' / ');
 
             const chart = Highcharts.chart(_id, {
                 chart: {

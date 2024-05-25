@@ -15,86 +15,90 @@
 
     <div class="card">
         <div class="card-header">
-            Listagem de SubTópicos.
-        </div>
-        <div class="card-body">
-            <div class="content-body">
-                @foreach ($menu as $key => $item)
-                    <div class="board">
-                        <div class="title">
-                            <img src="{{ asset('images/engine.png') }}" alt=""><br/>
-                            <a href="chart/{{ $item['view'] }}?type_event[]={{ $item['base64'] }}">{{ $key }}</a>
-                        </div>
-                    </div>
-                @endforeach
-                <div class="board bg-important">
-                    <div class="title">
-                        <a href="chart/{{ $item['view'] }}?type_event[]=TWFxdWluYSBPbiBMaW5l&type_event[]=SG9yaW1ldHJvIE1vdG9yIERpZXNlbA==&type_event[]=SG9yaW1ldHJvIEVzdGVpcmFzIExvY29tb8Onw6Nv&type_event[]=QWxhcm1lIEF0aXZv">•
-                            Maquina On Line <br> • Horimetro Motor Diesel <br> • Horimetro Esteiras Locomoção <br> • Alarme Ativo
-                        </a>
-                    </div>
-                </div>
-                <div class="board bg-important">
-                    <div class="title">
-                        <a href="chart/{{ $item['view'] }}?type_event[]=UmVnaXN0cm8gUHJvZHVjYW8gU2VtIFJlc2V0&type_event[]=TWFxdWluYSBPbiBMaW5l&type_event[]=U2l0dWHDp8OjbyBUcmFuc3BvcnRhZG9yIGRlIFNhaWRh&type_event[]=U2l0dWHDp8OjbyBBbGltZW50YcOnw6NvIE1hcXVpbmE=&type_event[]=QWxhcm1lIEF0aXZv">
-                            • Registro Producao Sem Reset <br> • Maquina On Line <br> • Situação Transportador de Saida <br> • Situação Alimentação Maquina <br> • Alarme Ativo
-                        </a>
-                    </div>
-                </div>
+            <div class="row">
+                <div class="col-md-6">Listagem de SubTópicos.</div>
+                <div class="col-md-6 text-right"><button type="button" class="btn btn-primary btn-sm" id="openUrl">CARREGAR MAIS DE UM INDICADOR</button></div>
             </div>
         </div>
+        <div class="card-body">
+
+           <div class="row">
+            <div class="col-md-6">
+                <a href="#" id="selectAll" class="link-primary">Marcar todos</a> | 
+                <a href="#" id="unselectAll" class="link-secondary">Desmarcar todos</a>
+                <div class="list-group">
+
+                    @foreach ($menu as $key => $item)
+                        <button class="list-group-item list-group-item-action">
+                            <input {{ $item['view'] == 'chart-up-to-1-value' ? '' : 'disabled' }} type="checkbox" value="{{ $item['base64'] }}" name="selected-indicators" id="selected-indicators">
+                            <a href="chart/{{ $item['view'] }}?type_event[]={{ $item['base64'] }}" class="text-uppercase">{{ $key }}</a>
+                        </button>
+                    @endforeach
+    
+                </div>
+            </div>
+           </div>
+
+        </div>        
     </div>
 
 @stop
 
 @section('css')
     <style>
-        .content-body {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        .content-body .board {
-            height: 120px;
-            margin: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            border: 1px solid #999;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            padding: 2px;
-            flex: 1 1 250px;
-            transition: ease .3s;
-        }
-
-        .content-body .board:hover {
-            background-color: #ccc;
-        }
-
-        .content-body .title {
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .content-body .title a {
-            color: #000;
-            font-size: 14px;
-        }
-
-        .content-body .board.bg-important {
-            display: inline-block;
-            background-color: #666;
-            border: 1px solid #333;!important;
-
-        }
-
-        .content-body .board.bg-important .title a {
-            color: white !important;
-        }
+      
     </style>
 @stop
 
 @section('js')
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const selectedIndicators = new Set();
+
+            document.querySelectorAll('input[name="selected-indicators"]').forEach(checkbox => {
+                checkbox.addEventListener('change', event => {
+                    if (event.target.checked) 
+                        selectedIndicators.add(event.target.value);
+                    else 
+                        selectedIndicators.delete(event.target.value);
+                });
+            });
+
+            document.getElementById('openUrl').addEventListener('click', () => {
+
+                const baseUrl = 'chart/chart-up-to-1-value';
+
+                var hashs = Array.from(selectedIndicators); 
+
+                if(!hashs.length)
+                    return Swal.fire('Atenção', 'Por favor, selecione pelo menos um indicador.', 'warning');
+
+
+                const urlOpen = `${baseUrl}?type_event[]=${hashs.join('&type_event[]=')}`;
+
+                window.location.href = urlOpen;
+            });
+
+            document.getElementById('selectAll').addEventListener('click', () => {
+                document.querySelectorAll('[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedIndicators.add(checkbox.value);
+                });
+            });
+
+            document.getElementById('unselectAll').addEventListener('click', () => {
+                document.querySelectorAll('[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                    selectedIndicators.delete(checkbox.value);
+                });
+            });
+
+        });
+
+    </script>
+
 @stop

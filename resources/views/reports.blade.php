@@ -3,7 +3,7 @@
 @section('title', config('app.name') . ' | Eventos')
 
 @section('content_header')
-    <h1>Eventos</h1>
+    <h5 class="font-weight-bold text-uppercase">Eventos</h5>
 @stop
 
 @section('preloader')
@@ -15,13 +15,8 @@
 
     <div>
         <div class="row">
-            <div class="col-md-6">
-                <form action="#" id="formFilterReports">
-                    <label for="">Período:</label>
-                    <input type="date" name="start-date" id="start-date">
-                    <input type="date" name="end-date" id="end-date">
-                    <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
-                </form>
+            <div class="col-md-12">
+                <x-filter :closed_period_disabled="1"/>
             </div>
         </div>
     </div>
@@ -54,7 +49,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            $('#formFilterReports').submit(function(e) {
+            $('#form-filter').submit(function(e) {
 
                 e.preventDefault();
 

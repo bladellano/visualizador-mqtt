@@ -249,7 +249,7 @@ class ApiController extends Controller
         endif;
 
         if (isset($_REQUEST['filter']) && !empty($_REQUEST['filter']))
-            $WHERE .= " AND DATE(history.data_maquina) BETWEEN '" . $_REQUEST['filter']['start-date'] . "' AND '" . $_REQUEST['filter']['end-date'] . "' ";
+            $WHERE .= " AND DATE(history.data_maquina) BETWEEN '" . $_REQUEST['filter']['start_date'] . "' AND '" . $_REQUEST['filter']['end_date'] . "' ";
         else
             $WHERE .= " AND history.data_maquina >= CURDATE() - INTERVAL 30 DAY ";
 

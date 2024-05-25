@@ -3,7 +3,7 @@
 @section('title', config('app.name') . ' | Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <h5 class="font-weight-bold text-uppercase">Dashboard</h5>
 @stop
 
 @section('preloader')
