@@ -15,6 +15,7 @@
                     <option value="30">Últimos 30 dias</option>
                     <option value="60" >Últimos 60 dias</option>
                     <option value="90">Últimos 90 dias</option>
+                    <option value="150">Últimos 150 dias</option>
                 </select>
             </div>
 
