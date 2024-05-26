@@ -80,7 +80,7 @@
     <script>
         
         TIME = 3000;
-        TITLE = 'Quantidade de disparos por dia.'
+        TITLE = 'Quantidade de disparos por dia: ';
 
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -110,6 +110,8 @@
 
                         $('#loading-screen').fadeIn();
 
+                        TITLE  = document.querySelector('[name="closed_period"] option:checked').text;
+
                         chart = createChartLine(TITLE, 'container', dataChartLine, 'line');
 
                     } catch (err) {
@@ -130,6 +132,7 @@
 
             try {
                 const dataChartLine = await getData('group_by_message=1');
+                TITLE  = document.querySelector('[name="closed_period"] option:checked').text;
                 chart = createChartLine(TITLE, 'container', dataChartLine, 'line');
 
             } catch (err) {
