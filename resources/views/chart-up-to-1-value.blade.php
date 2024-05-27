@@ -228,7 +228,12 @@
                     type: _type
                 },
                 title: {
-                    text: _title
+                    text: _title,
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
                 },
                 xAxis: {
                     categories: categories_,
