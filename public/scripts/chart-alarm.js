@@ -1,15 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-      //? Start
-      (async () => {
+    var categories = ['OFFLINE', 'ATIVO'];
+    var selector = 'chart-alarm';
+    var typeEvent = 'QWxhcm1lIEF0aXZv';
+    var titleChart = 'Alarme';
+
+    //? Start
+    (async () => {
 
         try {
 
             const params = $('#form-filter').serialize();
-            
-            const data = await fetchData('/api/get-events' + `?${params}&type_event=QWxhcm1lIEF0aXZv`);
 
-            createStateChart('chart-alarm', data, 'Alarme', ['OFFLINE', 'ATIVO']);
+            const data = await fetchData('/api/get-events' + `?${params}&type_event=${typeEvent}`);
+
+            createStateChart(selector, data, titleChart, categories);
 
         } catch (err) {
 
@@ -18,9 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     })();
 
-    $('#form-filter').submit(function(e) {
+    $('#form-filter').submit(function (e) {
 
-        e.preventDefault(); 
+        e.preventDefault();
 
         const params = $(e.target).serialize();
         const qs = Object.fromEntries(new URLSearchParams(params));
@@ -28,20 +33,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!qs.closed_period && (!qs.start_date || !qs.end_date))
             return Swal.fire('Erro', 'Por favor, preencha o filtro corretamente.', 'error');
 
-        $('#loading-screen').fadeIn();
-
         (async () => {
-            
+
             try {
-                const data = await fetchData('/api/get-events' + `?${params}&type_event=QWxhcm1lIEF0aXZv`);
-                createStateChart('chart-status', data, 'Status da Máquina', ['OFFLINE', 'ONLINE']);
+                const data = await fetchData('/api/get-events' + `?${params}&type_event=${typeEvent}`);
+                createStateChart(selector, data, titleChart, categories);
             } catch (err) {
                 Swal.fire('Erro', err.message, 'error');
             }
 
         })();
-
-        $('#loading-screen').fadeOut();
 
     });
 
