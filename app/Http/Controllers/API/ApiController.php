@@ -24,9 +24,9 @@ class ApiController extends Controller
         $where = " WHERE TRUE ";
 
         if (!empty($request->closed_period)) {
-            $where .= " AND " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
         } else {
-            $where .= " AND " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') >= CURDATE() - INTERVAL 1 DAY";
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL 1 DAY";
         }
 
         $SQL = "
