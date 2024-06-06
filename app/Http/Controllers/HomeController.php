@@ -43,6 +43,11 @@ class HomeController extends Controller
         return view($slug);
     }
 
+    public function main()
+    {
+        return view('main');
+    }
+
     public function indicators()
     {
         $menu = \App\Classes\Indicadores::MENU;

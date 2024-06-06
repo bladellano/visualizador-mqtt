@@ -12,6 +12,41 @@ use App\Http\Controllers\Controller;
 
 class ApiController extends Controller
 {
+
+    public function getEvents(Request $request)
+    {
+
+        $where = " WHERE TRUE ";
+
+        if(!empty($request->closed_period)) {
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+        } else {
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL 1 DAY";
+        }
+
+        $SQL = "
+            SELECT
+                mhv.*,
+                SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
+                STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') AS data_maquina,
+                SUBSTRING_INDEX(value, ';', -1) AS mensagem,
+                CONCAT(YEAR(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 
+                '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
+                SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento,
+                UNIX_TIMESTAMP(mhv.ts) as _timestamp,
+                DATE_FORMAT(mhv.ts, '%d/%m/%Y') AS ts_formated
+                FROM
+                    mqtt_history_view mhv  
+                        $where
+                        AND SUBSTR(topic, LOCATE('/', topic) + 1) IN ('Maquina On Line') 
+                        ORDER BY mhv.id DESC";
+
+        $record = DB::connection('meraki_mqtt')->select($SQL);
+
+        return response()->json($record);
+
+    }
+
     public function eventDetails($id, $type)
     {
 

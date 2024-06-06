@@ -318,6 +318,10 @@ return [
             'icon' => 'fas fa-chart-pie',
             'submenu' => [
                 [
+                    'text' => 'Eventos TITAN',
+                    'url' => '/main',
+                ],
+                [
                     'text' => 'Principal',
                     'url' => '/dashboard',
                 ],
