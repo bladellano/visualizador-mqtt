@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
 
             const params = $('#form-filter').serialize();
+            
+            const data = await fetchData('/api/get-events' + `?${params}&type_event=QWxhcm1lIEF0aXZv`);
 
-            const data = await fetchData('/api/get-events' + `?${params}&type_event=TWFxdWluYSBPbiBMaW5l`);
-
-            createStateChart('chart-status', data, 'Status da Máquina', ['OFFLINE', 'ONLINE']);
+            createStateChart('chart-alarm', data, 'Alarme', ['OFFLINE', 'ATIVO']);
 
         } catch (err) {
 
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
         (async () => {
             
             try {
-                const data = await fetchData('/api/get-events' + `?${params}&type_event=TWFxdWluYSBPbiBMaW5l`);
+                const data = await fetchData('/api/get-events' + `?${params}&type_event=QWxhcm1lIEF0aXZv`);
                 createStateChart('chart-status', data, 'Status da Máquina', ['OFFLINE', 'ONLINE']);
             } catch (err) {
                 Swal.fire('Erro', err.message, 'error');

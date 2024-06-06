@@ -23,6 +23,9 @@ class ApiController extends Controller
 
         $where = " WHERE TRUE ";
 
+        if (isset($request->type_event) && !empty($request->type_event))
+            $where .= " AND SUBSTR(topic, LOCATE('/', topic) + 1) IN ('" . base64_decode($request->type_event) . "') ";
+
         if (!empty($request->closed_period)) {
             $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
         } else {
@@ -34,17 +37,20 @@ class ApiController extends Controller
                 mhv.*,
                 SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
                 " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') AS data_maquina,
-                SUBSTRING_INDEX(value, ';', -1) AS mensagem,
                 SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento,
                 UNIX_TIMESTAMP(mhv.ts) as _timestamp,
                 DATE_FORMAT(mhv.ts, '%d/%m/%Y') AS ts_formated
                 FROM
                     mqtt_history_view mhv  
                         $where
-                        AND SUBSTR(topic, LOCATE('/', topic) + 1) IN ('Maquina On Line') 
                         ORDER BY " . self::dateMachine() . ", '%d/%m/%Y - %H:%i')";
 
         $record = DB::connection('meraki_mqtt')->select($SQL);
+
+        $record = array_map(function ($item) {
+            $item->value = \App\Classes\Helper::removeUnwantedCharacters($item->value); //? Remove caracteres indesejaveis.
+            return $item;
+        }, $record);
 
         return response()->json($record);
     }
