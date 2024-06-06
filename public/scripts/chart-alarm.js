@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         (async () => {
 
+            chartLoading(selector);
+
             try {
                 const data = await fetchData('/api/get-events' + `?${params}&type_event=${typeEvent}`);
                 createStateChart(selector, data, titleChart, categories);

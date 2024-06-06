@@ -86,3 +86,7 @@ function hasContent(data) {
         throw new Error("Nenhum resultado foi encontrado.");
     }
 }
+
+function chartLoading(element) {
+    $(`#${element}`).html('<i class="fas fa-4x fa-spin fa-spinner text-secondary"></i>');
+}

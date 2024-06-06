@@ -33,14 +33,14 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div id="chart-status" style="width:100%; height:400px;"></div>
+                    <div id="chart-status" style="width:100%; height:400px; text-align:center"></div>
                 </div>
             </div>
 
 
             <div class="row">
                 <div class="col-md-12">
-                    <div id="chart-alarm" style="width:100%; height:400px;"></div>
+                    <div id="chart-alarm" style="width:100%; height:400px; text-align:center"></div>
                 </div>
             </div>
 
