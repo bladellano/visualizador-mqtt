@@ -13,25 +13,28 @@ use App\Http\Controllers\Controller;
 class ApiController extends Controller
 {
 
+    private static function dateMachine()
+    {
+        return " STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1) ";
+    }
+
     public function getEvents(Request $request)
     {
 
         $where = " WHERE TRUE ";
 
-        if(!empty($request->closed_period)) {
-            $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+        if (!empty($request->closed_period)) {
+            $where .= " AND " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') >= CURDATE() - INTERVAL {$request->closed_period} DAY";
         } else {
-            $where .= " AND mhv.ts >= CURDATE() - INTERVAL 1 DAY";
+            $where .= " AND " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') >= CURDATE() - INTERVAL 1 DAY";
         }
 
         $SQL = "
             SELECT
                 mhv.*,
                 SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
-                STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') AS data_maquina,
+                " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') AS data_maquina,
                 SUBSTRING_INDEX(value, ';', -1) AS mensagem,
-                CONCAT(YEAR(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 
-                '-', LPAD(MONTH(STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i')), 2, '0')) AS ano_mes,
                 SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento,
                 UNIX_TIMESTAMP(mhv.ts) as _timestamp,
                 DATE_FORMAT(mhv.ts, '%d/%m/%Y') AS ts_formated
@@ -39,12 +42,11 @@ class ApiController extends Controller
                     mqtt_history_view mhv  
                         $where
                         AND SUBSTR(topic, LOCATE('/', topic) + 1) IN ('Maquina On Line') 
-                        ORDER BY mhv.id DESC";
+                        ORDER BY " . self::dateMachine() . ", '%d/%m/%Y - %H:%i')";
 
         $record = DB::connection('meraki_mqtt')->select($SQL);
 
         return response()->json($record);
-
     }
 
     public function eventDetails($id, $type)
@@ -96,13 +98,11 @@ class ApiController extends Controller
         if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
 
             $where .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
-
-        } else if(isset($request->closed_period) && !empty($request->closed_period)) {
+        } else if (isset($request->closed_period) && !empty($request->closed_period)) {
 
             $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
-
         } else {
-            
+
             $where .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
         }
 
@@ -165,13 +165,11 @@ class ApiController extends Controller
         if ((isset($request->start_date) && !empty($request->start_date)) && isset($request->end_date) && !empty($request->end_date)) {
 
             $where .= " AND mhv.ts BETWEEN '$request->start_date' AND '$request->end_date'";
-
-        } else if(isset($request->closed_period) && !empty($request->closed_period)) {
+        } else if (isset($request->closed_period) && !empty($request->closed_period)) {
 
             $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
-
         } else {
-            
+
             $where .= " AND mhv.ts >= CURDATE() - INTERVAL 90 DAY";
         }
 
@@ -231,7 +229,7 @@ class ApiController extends Controller
             $grouped = $collection->groupBy('mensagem');
             $records = $grouped->toArray();
         }
-        
+
         return response()->json($records);
     }
 

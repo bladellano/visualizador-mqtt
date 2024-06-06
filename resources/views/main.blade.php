@@ -3,6 +3,7 @@
 @section('title', config('app.name') . ' | Eventos TITAN')
 
 @section('content_header')
+    <x-loading />
     <h5 class="font-weight-bold text-uppercase">Eventos TITAN</h5>
 @stop
 
@@ -46,9 +47,6 @@
 @section('css')
     <link rel="stylesheet" href="https://code.highcharts.com/dashboards/css/dashboards.css">
     <link rel="stylesheet" href="{{ asset('assets/css/loading.css') }}">
-    <style>
-
-    </style>
 @stop
 
 @section('js')

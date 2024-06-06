@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!qs.closed_period && (!qs.start_date || !qs.end_date))
             return Swal.fire('Erro', 'Por favor, preencha o filtro corretamente.', 'error');
 
+        $('#loading-screen').fadeIn();
+
         (async () => {
             
             try {
@@ -38,6 +40,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
         })();
+
+        $('#loading-screen').fadeOut();
 
     });
 
