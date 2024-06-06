@@ -86,8 +86,8 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
         },
         xAxis: {
             type: 'datetime',
-            endOnTick: true,
-            startOnTick: true,
+            // endOnTick: true,
+            // startOnTick: true,
         },
         series: [{
             name: 'Tempo',

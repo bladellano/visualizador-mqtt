@@ -52,7 +52,5 @@
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
-    {{-- <script src="https://code.highcharts.com/themes/dark-unica.js"></script> --}}
-    {{-- <script src="https://code.highcharts.com/themes/brand-dark.js"></script> --}}
     <script src="{{ asset('scripts/chart-status.js') }}"></script>
 @stop
