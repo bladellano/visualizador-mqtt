@@ -50,6 +50,8 @@ class ApiController extends Controller
             return $item;
         }, $record);
 
+        @ob_end_clean();
+        
         return response()->json($record);
     }
 
