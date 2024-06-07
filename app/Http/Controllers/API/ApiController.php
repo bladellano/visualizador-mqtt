@@ -35,8 +35,7 @@ class ApiController extends Controller
 
         $SQL = "
             SELECT
-                mhv.id,
-                mhv.ts,
+                mhv.id, mhv.ts,
                 " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') AS data_maquina,
                 SUBSTRING_INDEX(value, ';', -1) AS mensagem
                 FROM
