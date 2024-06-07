@@ -8,7 +8,11 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
         const dateISO8601 = convertToISO8601(entry.data_maquina);
         const currDate = new Date(dateISO8601);
 
-        chartData.push([dateISO8601, 1]);
+        chartData.push({
+            x:Date.parse(dateISO8601),
+            y:1,
+            message:entry.mensagem
+        });
 
         const nextEntry = arr[index + 1];
 
@@ -20,12 +24,17 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
 
                 offDate.setMinutes(offDate.getMinutes() + 1);
 
-                chartData.push([offDate.toISOString(), 0]);
+                chartData.push({
+                    x:Date.parse(offDate.toISOString()),
+                    y:0,
+                    message:''
+                });
             }
         }
     });
 
     Highcharts.chart(_sElement, {
+         //? chart: { type: 'line' }, // Tipo de graficos - bar/pie/line(default).
         title: {
             text: _sTitle,
             align: 'center'
@@ -35,18 +44,25 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
                 text: 'Status'
             },
             categories: _aCategories,
+            //? reversed: true // Pode ser preciso inverter.
         },
         xAxis: {
             type: 'datetime',
         },
         series: [{
             name: 'Tempo',
-            data: chartData.map(point => [Date.parse(point[0]), point[1]]),
+            data: chartData,
             step: 'left',
             marker: {
                 enabled: false
             }
-        }]
+            //? dataLabels: { enabled: true } // Exibe os pontos nas linhas.
+        }],
+        tooltip: {
+            formatter: function () {
+                return `<b>${Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x)}</b><br/> Status: ${this.point.message}`;
+            }
+        }
     });
 
     hideCopyright();

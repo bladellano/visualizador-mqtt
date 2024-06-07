@@ -4,7 +4,7 @@
 
 @section('content_header')
     <x-loading />
-    <h5 class="font-weight-bold text-uppercase">Eventos TITAN</h5>
+    <h5 class="font-weight-bold text-uppercase text-success">Eventos TITAN</h5>
 @stop
 
 @section('preloader')
@@ -19,7 +19,7 @@
 
         <div class="card-header">
             <div class="row">
-                <div class="col-md-6">Dashboard</div>
+                <div class="col-md-6 text-light">Dashboard</div>
             </div>
         </div>
 
@@ -50,13 +50,20 @@
             height:250px; 
             text-align:center
         }
+        .content-header, .content {
+            background-color:#000; 
+        }
+        .card {
+            background-color:#181b1f;
+        }
     </style>
 @stop
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
-    {{-- <script src="https://code.highcharts.com/themes/dark-unica.js"></script> --}}
+
+    <script src="{{ asset('scripts/dellano-dark-theme.js') }}"></script>
 
     <script src="{{ asset('scripts/main.js') }}"></script>
     <script src="{{ asset('scripts/chart-status.js') }}"></script>

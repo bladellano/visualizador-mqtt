@@ -34,10 +34,10 @@
 
         <div class="row mt-2">
             <div class="col-md-12">
-                <button id="btn-filter" type="submit" class="btn btn-outline-secondary btn-sm">
+                <button id="btn-filter" type="submit" class="btn btn-secondary btn-sm">
                     FILTRAR
                 </button>
-                <button type="button" onclick="document.getElementById('form-filter').reset()" class="btn btn-outline-secondary btn-sm float-right">
+                <button type="button" onclick="document.getElementById('form-filter').reset()" class="btn btn-secondary btn-sm float-right">
                     LIMPAR
                 </button>
             </div>

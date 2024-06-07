@@ -38,6 +38,7 @@ class ApiController extends Controller
                 SUBSTRING_INDEX(topic, '/', 1) AS nome_maquina,
                 " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') AS data_maquina,
                 SUBSTRING_INDEX(topic, '/', -1) AS tipo_evento,
+                SUBSTRING_INDEX(value, ';', -1) AS mensagem,
                 UNIX_TIMESTAMP(mhv.ts) as _timestamp,
                 DATE_FORMAT(mhv.ts, '%d/%m/%Y') AS ts_formated
                 FROM
@@ -49,6 +50,7 @@ class ApiController extends Controller
 
         $record = array_map(function ($item) {
             $item->value = \App\Classes\Helper::removeUnwantedCharacters($item->value); //? Remove caracteres indesejaveis.
+            $item->mensagem = \App\Classes\Helper::removeUnwantedCharacters($item->mensagem); //? Remove caracteres indesejaveis.
             return $item;
         }, $record);
 
