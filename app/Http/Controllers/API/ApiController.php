@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-ini_set('memory_limit', '-1');
-set_time_limit(0);
+ini_set('memory_limit', '512M');
+ini_set('max_execution_time', '300');
 
 use stdClass;
 use Carbon\Carbon;
@@ -51,7 +51,7 @@ class ApiController extends Controller
         }, $record);
 
         @ob_end_clean();
-        
+
         return response()->json($record);
     }
 
