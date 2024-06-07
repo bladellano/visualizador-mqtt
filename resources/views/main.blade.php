@@ -34,7 +34,8 @@
             {{-- Adicionar charts --}}
             <hr><div class="row"><div class="col-md-12"> <div id="chart-status" class="chart-card"></div></div></div>
             <hr><div class="row"><div class="col-md-12"> <div id="chart-alarm" class="chart-card"></div></div></div>
-            <hr><div class="row"><div class="col-md-12"> <div id="chart-dieseleengine-hour-meter" class="chart-card"></div></div></div>
+            <hr><div class="row"><div class="col-md-12"> <div id="chart-horimetro-motor-diesel" class="chart-card"></div></div></div>
+            <hr><div class="row"><div class="col-md-12"> <div id="chart-horimetro-esteiras-locomocao" class="chart-card"></div></div></div>
             {{-- Fim charts --}}
         </div>
     </div>
@@ -66,7 +67,9 @@
     <script src="{{ asset('scripts/dellano-dark-theme.js') }}"></script>
 
     <script src="{{ asset('scripts/main.js') }}"></script>
+
     <script src="{{ asset('scripts/chart-status.js') }}"></script>
     <script src="{{ asset('scripts/chart-alarm.js') }}"></script>
-    <script src="{{ asset('scripts/chart-dieseleengine-hour-meter.js') }}"></script>
+    <script src="{{ asset('scripts/chart-horimetro-motor-diesel.js') }}"></script>
+    <script src="{{ asset('scripts/chart-horimetro-esteiras-locomocao.js') }}"></script>
 @stop

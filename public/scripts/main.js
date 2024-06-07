@@ -83,7 +83,8 @@ async function fetchData(endpoint) {
         const response = await fetch(endpoint);
         const data = await response.json();
 
-        return hasContent(data);
+        //? return hasContent(data); Caso queira usar Exception.
+        return data;
 
     } catch (error) {
         throw error;

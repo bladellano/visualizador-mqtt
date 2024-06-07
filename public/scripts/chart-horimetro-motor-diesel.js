@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     var categories = ['NÃO', 'SIM'];
-    var selector = 'chart-dieseleengine-hour-meter';
+    var selector = 'chart-horimetro-motor-diesel';
     var typeEvent = 'SG9yaW1ldHJvIE1vdG9yIERpZXNlbA==';
     var titleChart = 'Horimetro Motor Diesel';
 
