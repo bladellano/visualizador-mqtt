@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 ini_set('memory_limit', '-1');
+set_time_limit(0);
 
 use stdClass;
 use Carbon\Carbon;

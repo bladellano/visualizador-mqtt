@@ -84,5 +84,5 @@
     <script src="{{ asset('scripts/chart-horimetro-esteiras-locomocao.js') }}"></script>
     <script src="{{ asset('scripts/chart-movimentacao-maquina.js') }}"></script>
     <script src="{{ asset('scripts/chart-situacao-producao.js') }}"></script>
-    <script src="{{ asset('scripts/chart-situacao-alimentacao-maquina.js') }}"></script>
+    <script src="{{ asset('scripts/chart-situacao-alimentacao-maquina.js') }}"></script> --}}
 @stop
