@@ -35,6 +35,15 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
 
     Highcharts.chart(_sElement, {
          //? chart: { type: 'line' }, // Tipo de graficos - bar/pie/line(default).
+         boost: {
+            useGPUTranslations: true,
+            usePreAllocated: true
+        },
+         chart: {
+            zooming: {
+                type: 'x'
+            }
+        },
         title: {
             text: _sTitle,
             align: 'center'
@@ -55,8 +64,9 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
             step: 'left',
             marker: {
                 enabled: false
-            }
+            },
             //? dataLabels: { enabled: true } // Exibe os pontos nas linhas.
+            boostThreshold: 15000 // Ativar boost para mais de 15000 pontos
         }],
         tooltip: {
             formatter: function () {

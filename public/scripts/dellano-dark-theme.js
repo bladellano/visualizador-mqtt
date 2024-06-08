@@ -194,13 +194,3 @@ Highcharts.theme = {
 
 // Aplique o tema dark
 Highcharts.setOptions(Highcharts.theme);
-
-// Crie seu gráfico normalmente
-Highcharts.chart('container', {
-    title: {
-        text: 'Título do Gráfico'
-    },
-    series: [{
-        data: [1, 3, 2, 4]
-    }]
-});
