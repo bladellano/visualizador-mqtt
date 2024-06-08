@@ -39,7 +39,6 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
         tooltip: {
             formatter: function () {
                 return `<b>${Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x)}</b><br/> Status: ${this.point.y}`;
-                //! return `<b>${Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x)}</b><br/> Status: ${this.point.message}`;
             }
         }
     });

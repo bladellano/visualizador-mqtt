@@ -38,7 +38,7 @@
                 <div class="col-md-6"> <div id="chart-movimentacao-maquina" class="chart-card"></div> </div>
             </div>
 
-            <hr><div class="row"><div class="col-md-12"> <div id="chart-alarm" class="chart-card"></div></div></div>
+            <hr><div class="row"><div class="col-md-12"> <div id="chart-alarme" class="chart-card"></div></div></div>
 
             <hr><div class="row"><div class="col-md-12"> <div id="chart-situacao-producao" class="chart-card"></div></div></div>
 
@@ -79,10 +79,11 @@
     <script src="{{ asset('scripts/main.js') }}"></script>
 
     <script src="{{ asset('scripts/chart-status.js') }}"></script>
-    <script src="{{ asset('scripts/chart-alarm.js') }}"></script>
+    <script src="{{ asset('scripts/chart-alarme.js') }}"></script>
     <script src="{{ asset('scripts/chart-horimetro-motor-diesel.js') }}"></script>
     <script src="{{ asset('scripts/chart-horimetro-esteiras-locomocao.js') }}"></script>
     <script src="{{ asset('scripts/chart-movimentacao-maquina.js') }}"></script>
     <script src="{{ asset('scripts/chart-situacao-producao.js') }}"></script>
-    <script src="{{ asset('scripts/chart-situacao-alimentacao-maquina.js') }}"></script> --}}
+    <script src="{{ asset('scripts/chart-situacao-alimentacao-maquina.js') }}"></script> 
+
 @stop

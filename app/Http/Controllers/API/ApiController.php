@@ -16,7 +16,7 @@ class ApiController extends Controller
 
     private static function dateMachine()
     {
-        return " STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1) ";
+        return " STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') ";
     }
 
     public function getEvents(Request $request)
@@ -36,12 +36,12 @@ class ApiController extends Controller
         $SQL = "
             SELECT
                 mhv.id, mhv.ts,
-                " . self::dateMachine() . ", '%d/%m/%Y - %H:%i') AS data_maquina,
+                " . self::dateMachine() . " AS data_maquina,
                 SUBSTRING_INDEX(value, ';', -1) AS mensagem
                 FROM
                     mqtt_history_view mhv  
                         $where
-                        ORDER BY " . self::dateMachine() . ", '%d/%m/%Y - %H:%i')";
+                        ORDER BY " . self::dateMachine();
 
         $record = DB::connection('meraki_mqtt')->select($SQL);
 
@@ -68,7 +68,7 @@ class ApiController extends Controller
                 'message' => $entry->mensagem
             ];
 
-            $nextEntry = $record[$index + 1] ?? null;
+            $nextEntry = $record[$index + 1] ?? NULL;
 
             if ($nextEntry) {
                 $nextDate = new \DateTime($nextEntry->data_maquina);

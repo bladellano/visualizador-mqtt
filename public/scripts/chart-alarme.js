@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     var categories = ['OFFLINE', 'ATIVO'];
-    var selector = 'chart-alarm';
+    var selector = 'chart-alarme';
     var typeEvent = 'QWxhcm1lIEF0aXZv';
     var titleChart = 'Alarme';
 
