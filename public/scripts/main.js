@@ -1,45 +1,45 @@
 
 function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
 
-    const chartData = [];
+    // const chartData = [];
 
-    _aData.forEach((entry, index, arr) => {
+    // _aData.forEach((entry, index, arr) => {
 
-        const dateISO8601 = convertToISO8601(entry.data_maquina);
-        const currDate = new Date(dateISO8601);
+    //     const dateISO8601 = convertToISO8601(entry.data_maquina);
+    //     const currDate = new Date(dateISO8601);
 
-        chartData.push({
-            x:Date.parse(dateISO8601),
-            y:1,
-            message:entry.mensagem
-        });
+    //     chartData.push({
+    //         x:Date.parse(dateISO8601),
+    //         y:1,
+    //         message:entry.mensagem
+    //     });
 
-        const nextEntry = arr[index + 1];
+    //     const nextEntry = arr[index + 1];
 
-        if (nextEntry) {
-            const nextDate = new Date(nextEntry.data_maquina);
-            const diffMinutes = (nextDate - currDate) / 1000 / 60;
-            if (diffMinutes > 2) {
-                const offDate = new Date(currDate);
+    //     if (nextEntry) {
+    //         const nextDate = new Date(nextEntry.data_maquina);
+    //         const diffMinutes = (nextDate - currDate) / 1000 / 60;
+    //         if (diffMinutes > 2) {
+    //             const offDate = new Date(currDate);
 
-                offDate.setMinutes(offDate.getMinutes() + 1);
+    //             offDate.setMinutes(offDate.getMinutes() + 1);
 
-                chartData.push({
-                    x:Date.parse(offDate.toISOString()),
-                    y:0,
-                    message:''
-                });
-            }
-        }
-    });
+    //             chartData.push({
+    //                 x:Date.parse(offDate.toISOString()),
+    //                 y:0,
+    //                 message:''
+    //             });
+    //         }
+    //     }
+    // });
 
     Highcharts.chart(_sElement, {
-         //? chart: { type: 'line' }, // Tipo de graficos - bar/pie/line(default).
-         boost: {
+         //? chart: { type: 'line' }, // Tipo de graficos - bar/pie/spline/line(default).
+        boost: {
             useGPUTranslations: true,
             usePreAllocated: true
         },
-         chart: {
+        chart: {
             zooming: {
                 type: 'x'
             }
@@ -60,7 +60,7 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
         },
         series: [{
             name: 'Tempo',
-            data: chartData,
+            data: _aData,
             step: 'left',
             marker: {
                 enabled: false

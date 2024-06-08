@@ -50,9 +50,44 @@ class ApiController extends Controller
             return $item;
         }, $record);
 
-        @ob_end_clean();
+         // Converte a data no formato ISO 8601
+         $convertToISO8601 = function ($dateString) {
+            $date = new \DateTime($dateString);
+            return $date->format(\DateTime::ATOM);
+        };
 
-        return response()->json($record);
+        $chartData = [];
+        
+        foreach ($record as $index => $entry) {
+            $dateISO8601 = $convertToISO8601($entry->data_maquina);
+            $currDate = new \DateTime($dateISO8601);
+            
+            $chartData[] = [
+                'x' => strtotime($dateISO8601) * 1000,
+                'y' => 1,
+                'message' => $entry->mensagem
+            ];
+
+            $nextEntry = $record[$index + 1] ?? null;
+
+            if ($nextEntry) {
+                $nextDate = new \DateTime($nextEntry->data_maquina);
+                $diffMinutes = ($nextDate->getTimestamp() - $currDate->getTimestamp()) / 60;
+                
+                if ($diffMinutes > 2) {
+                    $offDate = clone $currDate;
+                    $offDate->modify('+1 minute');
+                    
+                    $chartData[] = [
+                        'x' => $offDate->getTimestamp() * 1000,
+                        'y' => 0,
+                        'message' => ''
+                    ];
+                }
+            }
+        }
+
+        return response()->json($chartData);
     }
 
     public function eventDetails($id, $type)
