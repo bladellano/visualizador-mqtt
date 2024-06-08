@@ -1,38 +1,6 @@
 
 function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
 
-    // const chartData = [];
-
-    // _aData.forEach((entry, index, arr) => {
-
-    //     const dateISO8601 = convertToISO8601(entry.data_maquina);
-    //     const currDate = new Date(dateISO8601);
-
-    //     chartData.push({
-    //         x:Date.parse(dateISO8601),
-    //         y:1,
-    //         message:entry.mensagem
-    //     });
-
-    //     const nextEntry = arr[index + 1];
-
-    //     if (nextEntry) {
-    //         const nextDate = new Date(nextEntry.data_maquina);
-    //         const diffMinutes = (nextDate - currDate) / 1000 / 60;
-    //         if (diffMinutes > 2) {
-    //             const offDate = new Date(currDate);
-
-    //             offDate.setMinutes(offDate.getMinutes() + 1);
-
-    //             chartData.push({
-    //                 x:Date.parse(offDate.toISOString()),
-    //                 y:0,
-    //                 message:''
-    //             });
-    //         }
-    //     }
-    // });
-
     Highcharts.chart(_sElement, {
          //? chart: { type: 'line' }, // Tipo de graficos - bar/pie/spline/line(default).
         boost: {
@@ -60,7 +28,7 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
         },
         series: [{
             name: 'Tempo',
-            data: _aData,
+            data: _aData.map(point => [point.x, point.y] ),
             step: 'left',
             marker: {
                 enabled: false
@@ -70,7 +38,8 @@ function createStateChart(_sElement, _aData, _sTitle, _aCategories) {
         }],
         tooltip: {
             formatter: function () {
-                return `<b>${Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x)}</b><br/> Status: ${this.point.message}`;
+                return `<b>${Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x)}</b><br/> Status: ${this.point.y}`;
+                //! return `<b>${Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x)}</b><br/> Status: ${this.point.message}`;
             }
         }
     });
