@@ -17,4 +17,5 @@ Route::get('/mensagens-um-valor', [ApiController::class, 'getMessageOneValue']);
 
 Route::middleware([GzipEncodeResponse::class])->group(function () {
     Route::get('/get-events', [ApiController::class, 'getEvents']);
+    Route::get('/get-events-ten-attributes', [ApiController::class, 'getEventsTenAttributes']);
 });

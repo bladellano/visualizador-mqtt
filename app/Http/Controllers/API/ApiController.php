@@ -14,6 +14,64 @@ use App\Http\Controllers\Controller;
 class ApiController extends Controller
 {
 
+    const ATTRIBUTES_DADOS_MOTOR_DIESEL = [
+        "Pressão Óleo Motor (Bar)" => 1,
+        "Pressão Turbina (Bar)" => 2,
+        "Temperatura Motor (ºC)" => 3,
+        "Temperatura Turbina (ºC)" => 4,
+        "Percentual Torque (%)" => 5,
+        "Rotação (RPM)" => 6,
+        "Tensão Bateria (V)" => 7,
+        "Media Consumo Geral (L/H)" => 8,
+        "Media Consumo Picando (L/H)" => 9,
+        "Media Consumo Desde a última Partida (L/H)" => 10
+    ];
+
+    public function getEventsTenAttributes(Request $request)
+    {
+        $where = " WHERE TRUE ";
+
+        if (!empty($request->closed_period)) 
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL {$request->closed_period} DAY";
+        else 
+            $where .= " AND mhv.ts >= CURDATE() - INTERVAL 1 DAY";
+
+        $SQL = "
+            SELECT 
+                mhv.id, mhv.value,
+                SUBSTR(mhv.topic, LOCATE('/', mhv.topic) + 1) AS evento,
+                STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') AS data_maquina
+                FROM mqtt_history_view mhv 
+                    $where  
+                    AND SUBSTR(topic, LOCATE('/', topic) + 1) IN ('Dados Motor Diesel')";
+
+        $record = DB::connection('meraki_mqtt')->select($SQL);
+
+        $new = [];
+
+        foreach(self::ATTRIBUTES_DADOS_MOTOR_DIESEL as $name => $number) {
+
+            foreach($record as $r) {
+
+                $attributes = explode(";", $r->value);
+
+                $new[$name][] = [
+                    'id' => $r->id,
+                    'value' => $r->value,
+                    'evento' => $r->evento,
+                    'data_maquina' => $r->data_maquina,
+                    'name_attribute' => $name,
+                    'v_attribute' => $attributes[$number],
+                ];
+
+            }
+
+        }
+
+        return response()->json($new);
+
+    }
+
     private static function dateMachine()
     {
         return " STR_TO_DATE(SUBSTRING_INDEX(value, ';', 1), '%d/%m/%Y - %H:%i') ";
